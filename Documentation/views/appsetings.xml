@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration file="appsettings.json" environment="Base">
+  <summary>Базовый файл конфигурации ASP.NET Core приложения с настройками подключения к базе данных, логирования и безопасности</summary>
+  
+  <location>Корень проекта</location>
+  <inheritance>
+    <parent>appsettings.json (базовый)</parent>
+    <child environment="Development">appsettings.Development.json</child>
+    <child environment="Production">appsettings.Production.json (при наличии)</child>
+  </inheritance>
+  
+  <sections>
+    <!-- Секция строк подключения -->
+    <section name="ConnectionStrings">
+      <purpose>Хранит строки подключения к базам данных и другим внешним ресурсам</purpose>
+      <entries>
+        <entry name="DefaultConnection">
+          <type>PostgreSQL</type>
+          <provider>Npgsql</provider>
+          <format>Строка подключения в формате Npgsql</format>
+          <parameters>
+            <parameter name="Host" value="localhost">
+              <description>Адрес сервера PostgreSQL</description>
+              <default>localhost</default>
+            </parameter>
+            <parameter name="Port" value="5432">
+              <description>Порт сервера PostgreSQL</description>
+              <default>5432</default>
+              <standardPort>true</standardPort>
+            </parameter>
+            <parameter name="Database" value="crm_database">
+              <description>Имя базы данных CRM системы</description>
+              <namingConvention>crm_database</namingConvention>
+            </parameter>
+            <parameter name="Username" value="postgres">
+              <description>Имя пользователя для аутентификации</description>
+              <defaultUser>postgres (стандартный суперпользователь PostgreSQL)</defaultUser>
+            </parameter>
+            <parameter name="Password" value="12345">
+              <description>Пароль пользователя PostgreSQL</description>
+              <securityNote>В продакшене должен быть сложным паролем и храниться в секретах</securityNote>
+            </parameter>
+          </parameters>
+          <additionalParameters>
+            <note>При необходимости можно добавить: Pooling=true, Timeout=30, CommandTimeout=30</note>
+          </additionalParameters>
+        </entry>
+      </entries>
+    </section>
+    
+    <!-- Секция логирования -->
+    <section name="Logging">
+      <purpose>Настройки системы логирования приложения</purpose>
+      <subsections>
+        <subsection name="LogLevel">
+          <purpose>Определяет минимальный уровень логирования для различных категорий</purpose>
+          <levels>
+            <level name="Default" value="Information">
+              <description>Уровень по умолчанию для всех категорий</description>
+              <meaning>Логируются информационные сообщения и выше (Warning, Error, Critical)</meaning>
+            </level>
+            <level name="Microsoft.AspNetCore" value="Warning">
+              <description>Уровень для компонентов ASP.NET Core</description>
+              <meaning>Логируются только предупреждения и ошибки, чтобы уменьшить шум в логах</meaning>
+              <rationale>Компоненты ASP.NET Core могут генерировать много информационных сообщений</rationale>
+            </level>
+          </levels>
+          <availableLevels>
+            <level priority="0">Trace (наиболее детальный)</level>
+            <level priority="1">Debug (отладка)</level>
+            <level priority="2">Information (информация)</level>
+            <level priority="3">Warning (предупреждение)</level>
+            <level priority="4">Error (ошибка)</level>
+            <level priority="5">Critical (критическая ошибка)</level>
+            <level priority="6">None (ничего не логировать)</level>
+          </availableLevels>
+        </subsection>
+      </subsections>
+      <providers>
+        <note>По умолчанию используется Console, Debug, EventSource провайдеры</note>
+      </providers>
+    </section>
+    
+    <!-- Секция безопасности -->
+    <section name="AllowedHosts">
+      <purpose>Безопасность: ограничение хостов, которые могут обращаться к приложению</purpose>
+      <value>*</value>
+      <interpretation>Разрешает запросы с любых хостов</interpretation>
+      <securityImplications>
+        <risk>В продакшене рекомендуется указать конкретные домены</risk>
+        <recommendation production="true">"example.com", "www.example.com"</recommendation>
+        <recommendation development="true">"*" (для удобства разработки)</recommendation>
+      </securityImplications>
+    </section>
+  </sections>
+  
+  <environmentSpecifics>
+    <development>
+      <recommendations>
+        <recommendation>
+          <file>appsettings.Development.json</file>
+          <purpose>Переопределить настройки для разработки</purpose>
+          <examples>
+            <example>
+              <description>Более детальное логирование</description>
+              <code>
+"Logging": {
+  "LogLevel": {
+    "Default": "Debug",
+    "Microsoft.AspNetCore": "Information"
+  }
+}
+              </code>
+            </example>
+            <example>
+              <description>Локальная база данных</description>
+              <code>
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Database=crm_dev;Username=postgres;Password=dev_password"
+}
+              </code>
+            </example>
+          </examples>
+        </recommendation>
+      </recommendations>
+    </development>
+    <production>
+      <securityRecommendations>
+        <recommendation>
+          <aspect>Строка подключения</aspect>
+          <action>Использовать секреты/переменные окружения вместо хранения в файле</action>
+          <method>dotnet user-secrets set "ConnectionStrings:DefaultConnection" "value"</method>
+          <environmentVariable>ConnectionStrings__DefaultConnection</environmentVariable>
+        </recommendation>
+        <recommendation>
+          <aspect>AllowedHosts</aspect>
+          <action>Ограничить конкретными доменами</action>
+          <value>"yourdomain.com", "www.yourdomain.com"</value>
+        </recommendation>
+      </securityRecommendations>
+    </production>
+  </environmentSpecifics>
+  
+  <databaseConfiguration>
+    <type>PostgreSQL</type>
+    <version>Не указана (совместима с 10.0+)</version>
+    <driver>Npgsql</driver>
+    <connectionPooling>
+      <enabled>По умолчанию true (включено)</enabled>
+      <note>Явно не указано, использует настройки по умолчанию Npgsql</note>
+    </connectionPooling>
+    <timeouts>
+      <command>Не указан (использует значение по умолчанию Npgsql - 30 секунд)</command>
+      <connection>Не указан (использует значение по умолчанию - 15 секунд)</connection>
+    </timeouts>
+  </databaseConfiguration>
+  
+  <securityNotes>
+    <warning level="high">
+      <content>Пароль "12345" в строке подключения слишком простой для продакшена</content>
+      <recommendation>Использовать сложный пароль и хранить в защищенном месте</recommendation>
+    </warning>
+    <warning level="medium">
+      <content>Использование пользователя "postgres" (суперпользователя) в приложении</content>
+      <recommendation>Создать отдельного пользователя с минимально необходимыми правами</recommendation>
+    </warning>
+    <note>
+      <content>AllowedHosts="*" допустимо в разработке, но должно быть ограничено в продакшене</content>
+    </note>
+  </securityNotes>
+  
+  <usageInCode>
+    <example>
+      <description>Получение строки подключения в Program.cs или DatabaseService</description>
+      <code>
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+      </code>
+    </example>
+    <example>
+      <description>Получение настроек логирования</description>
+      <code>
+var logLevel = builder.Configuration.GetSection("Logging:LogLevel")["Default"];
+      </code>
+    </example>
+  </usageInCode>
+  
+  <fileDependencies>
+    <relatedFile name="Program.cs">
+      <usage>Чтение конфигурации через WebApplicationBuilder.Configuration</usage>
+    </relatedFile>
+    <relatedFile name="DatabaseService.cs">
+      <usage>Использование строки подключения для работы с PostgreSQL</usage>
+    </relatedFile>
+    <relatedFile name="appsettings.Development.json">
+      <relationship>Переопределяет настройки в среде Development</relationship>
+    </relatedFile>
+  </fileDependencies>
+</configuration>

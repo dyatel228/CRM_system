@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Edit" path="Views/Deals/Edit.cshtml" controller="DealsController" action="Edit">
+  <summary>Форма редактирования существующей сделки с предзаполненными данными и динамическим выбором связанных сущностей</summary>
+  
+  <model type="CRM.Web.Models.Deal">
+    <summary>Модель сделки с текущими данными для редактирования</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Редактирование сделки">
+      <summary>Заголовок страницы редактирования сделки</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Deals/Edit/@Model.Id">
+    <hiddenFields>
+      <field name="Id" value="@Model.Id">
+        <summary>Скрытое поле с ID сделки для идентификации в базе данных</summary>
+      </field>
+    </hiddenFields>
+    
+    <!-- Основное поле: Название сделки -->
+    <fieldGroup name="dealInfo" layout="single">
+      <field name="DealName" type="text" required="true">
+        <label>Название сделки</label>
+        <value>@Model.DealName</value>
+        <validation>
+          <required>true</required>
+        </validation>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: Клиент и менеджер -->
+    <fieldGroup name="participants" layout="row" columns="2">
+      <field name="ClientId" type="select" required="true">
+        <label>Клиент</label>
+        <placeholder>Выберите клиента</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <validation>
+          <required>true</required>
+        </validation>
+        <optionsSource>ViewBag.Clients</optionsSource>
+        <options>
+          <option value="" default="true">
+            <label>Выберите клиента</label>
+          </option>
+          <dynamicOptions collection="ViewBag.Clients" item="client">
+            <option value="@client.Id" selected="@(client.Id == Model.ClientId)">
+              <label>@client.CompanyName</label>
+            </option>
+          </dynamicOptions>
+        </options>
+        <note>Текущий клиент выбран по умолчанию</note>
+      </field>
+      
+      <field name="ResponsibleUserId" type="select" required="false">
+        <label>Ответственный менеджер</label>
+        <placeholder>Не назначен</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <optionsSource>ViewBag.Users</optionsSource>
+        <options>
+          <option value="" default="true">
+            <label>Не назначен</label>
+          </option>
+          <dynamicOptions collection="ViewBag.Users" item="user">
+            <option value="@user.Id" selected="@(user.Id == Model.ResponsibleUserId)">
+              <label>@user.LastName @user.FirstName</label>
+            </option>
+          </dynamicOptions>
+        </options>
+        <note>Текущий ответственный выбран по умолчанию</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: Сумма и стадия -->
+    <fieldGroup name="dealDetails" layout="row" columns="2">
+      <field name="Amount" type="number" required="true">
+        <label>Сумма (₽)</label>
+        <value>@Model.Amount</value>
+        <columnSize>col-md-6</columnSize>
+        <validation>
+          <required>true</required>
+          <min>0</min>
+          <step>0.01</step>
+        </validation>
+        <format>Десятичное число</format>
+        <currency>₽</currency>
+      </field>
+      
+      <field name="Stage" type="select" required="false">
+        <label>Стадия</label>
+        <columnSize>col-md-6</columnSize>
+        <options>
+          <option value="Переговоры" selected="@(Model.Stage == &quot;Переговоры&quot;)">
+            <label>Переговоры</label>
+          </option>
+          <option value="Оформление" selected="@(Model.Stage == &quot;Оформление&quot;)">
+            <label>Оформление</label>
+          </option>
+          <option value="Закрыта" selected="@(Model.Stage == &quot;Закрыта&quot;)">
+            <label>Закрыта</label>
+          </option>
+          <option value="Отменена" selected="@(Model.Stage == &quot;Отменена&quot;)">
+            <label>Отменена</label>
+          </option>
+        </options>
+        <note>Текущая стадия выбрана по умолчанию</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле: Срок исполнения -->
+    <fieldGroup name="deadline" layout="single">
+      <field name="DeadlineDate" type="date" required="false">
+        <label>Срок исполнения</label>
+        <value>@(Model.DeadlineDate?.ToString("yyyy-MM-dd") ?? "")</value>
+        <format>yyyy-MM-dd (формат HTML5 date input)</format>
+        <note>Пустое значение, если DeadlineDate равен null</note>
+      </field>
+    </fieldGroup>
+    
+    <actions>
+      <action type="submit" class="btn btn-warning">
+        <icon>fas fa-save</icon>
+        <label>Сохранить</label>
+      </action>
+      <action type="cancel" href="/Deals" class="btn btn-outline-secondary">
+        <icon>fas fa-times</icon>
+        <label>Отмена</label>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Динамические предвыбранные значения">
+      <summary>В выпадающих списках автоматически выбираются текущие значения сделки</summary>
+      <logic>selected="@(client.Id == Model.ClientId)" и selected="@(user.Id == Model.ResponsibleUserId)"</logic>
+    </feature>
+    <feature name="Форматирование даты для HTML5">
+      <summary>Дата преобразуется в формат yyyy-MM-dd для корректной работы input type="date"</summary>
+      <format>@(Model.DeadlineDate?.ToString("yyyy-MM-dd") ?? "")</format>
+      <note>Пустая строка для null значений</note>
+    </feature>
+    <feature name="Сохранение связей">
+      <summary>Поддерживается редактирование связей с клиентами и пользователями через выпадающие списки</summary>
+    </feature>
+  </features>
+  
+  <differences from="deals_create.xml">
+    <difference>
+      <field>Действие формы</field>
+      <create>/Deals/Create</create>
+      <edit>/Deals/Edit/@Model.Id</edit>
+    </difference>
+    <difference>
+      <field>Скрытое поле Id</field>
+      <create>Отсутствует</create>
+      <edit>Присутствует со значением @Model.Id</edit>
+    </difference>
+    <difference>
+      <field>Предзаполнение данных</field>
+      <create>Пустые поля с placeholder</create>
+      <edit>Все поля предзаполнены значениями сделки</edit>
+    </difference>
+    <difference>
+      <field>Логика выбора в списках</field>
+      <create>Значения по умолчанию</create>
+      <edit>Сравнение с текущими значениями Model</edit>
+    </difference>
+    <difference>
+      <field>Форматирование DeadlineDate</field>
+      <create>Пустое поле</create>
+      <edit>Преобразование в yyyy-MM-dd или пустая строка</edit>
+    </difference>
+    <difference>
+      <field>Текст кнопки отправки</field>
+      <create>Создать сделку</create>
+      <edit>Сохранить</edit>
+    </difference>
+  </differences>
+  
+  <dataProcessing>
+    <transformation field="DeadlineDate">
+      <from>DateTime?</from>
+      <to>string (yyyy-MM-dd)</to>
+      <logic>@(Model.DeadlineDate?.ToString("yyyy-MM-dd") ?? "")</logic>
+      <purpose>Поддержка HTML5 input type="date"</purpose>
+    </transformation>
+    <transformation field="Amount">
+      <from>decimal</from>
+      <to>string (decimal representation)</to>
+      <note>Автоматическое преобразование decimal в string для value атрибута</note>
+    </transformation>
+  </dataProcessing>
+  
+  <validation>
+    <field name="DealName">
+      <required>true</required>
+    </field>
+    <field name="ClientId">
+      <required>true</required>
+      <foreignKey>true</foreignKey>
+    </field>
+    <field name="Amount">
+      <required>true</required>
+      <type>number</type>
+      <min>0</min>
+      <step>0.01</step>
+    </field>
+  </validation>
+  
+  <userExperience>
+    <aspect name="Консистентность">
+      <description>Форма редактирования использует ту же структуру, что и форма создания</description>
+    </aspect>
+    <aspect name="Ясность изменений">
+      <description>Пользователь видит текущие значения и понимает, что именно будет изменено</description>
+    </aspect>
+    <aspect name="Удобство редактирования связей">
+      <description>Выпадающие списки позволяют легко изменить клиента или ответственного</description>
+    </aspect>
+  </userExperience>
+</view>

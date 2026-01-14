@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Delete" path="Views/Users/Delete.cshtml" controller="UsersController" action="Delete">
+  <summary>Страница подтверждения удаления пользователя с отображением его данных и предупреждением о необратимости действия</summary>
+  
+  <model type="CRM.Web.Models.User">
+    <summary>Модель пользователя для отображения его данных перед удалением</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Удаление пользователя">
+      <summary>Заголовок страницы подтверждения удаления</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <container type="div" class="form-container">
+        <header type="h1" class="form-title">
+          <icon>fas fa-user-times</icon>
+          <content>Удаление пользователя</content>
+        </header>
+        
+        <!-- Блок предупреждения -->
+        <warning type="div" class="alert alert-danger">
+          <heading type="h4">Вы уверены, что хотите удалить этого пользователя?</heading>
+          <message type="p">Это действие нельзя отменить.</message>
+          <importance>high</importance>
+          <irreversible>true</irreversible>
+        </warning>
+        
+        <!-- Информация о пользователе -->
+        <infoSection type="div" class="user-info">
+          <heading type="h4">Информация о пользователе:</heading>
+          <fields>
+            <field name="ФИО">
+              <value>@Model.GetFullName()</value>
+              <method>GetFullName()</method>
+              <note>Используется метод модели User для получения полного имени</note>
+            </field>
+            <field name="Email">
+              <value>@Model.Email</value>
+            </field>
+            <field name="Телефон">
+              <value>@Model.Phone</value>
+            </field>
+            <field name="Роль">
+              <value>
+                <badge class="bg-primary">@Model.Role</badge>
+              </value>
+              <visual>color-coded-badge</visual>
+            </field>
+            <field name="Дата создания">
+              <value>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</value>
+              <format>dd.MM.yyyy HH:mm</format>
+              <note>Отображение даты и времени создания записи</note>
+            </field>
+          </fields>
+          <purpose>
+            <summary>Пользователь видит полную информацию о удаляемом объекте для принятия осознанного решения</summary>
+          </purpose>
+        </infoSection>
+        
+        <!-- Форма действий -->
+        <actions type="div" class="form-actions">
+          <!-- Форма удаления -->
+          <form method="post" action="/Users/Delete/@Model.Id" style="display: inline;">
+            <hiddenFields>
+              <field name="Id" value="@Model.Id">
+                <summary>ID пользователя передается в POST-запросе</summary>
+              </field>
+            </hiddenFields>
+            <action type="submit" class="btn btn-danger">
+              <icon>fas fa-trash</icon>
+              <label>Удалить</label>
+              <confirmation>implicit</confirmation>
+              <irreversible>true</irreversible>
+            </action>
+          </form>
+          
+          <!-- Кнопка отмены -->
+          <action type="cancel" href="/Users" class="btn btn-outline-secondary">
+            <icon>fas fa-times</icon>
+            <label>Отмена</label>
+            <safe>true</safe>
+          </action>
+        </actions>
+      </container>
+    </container>
+  </structure>
+  
+  <userInterface>
+    <elements>
+      <element name="Заголовок с иконкой">
+        <icon>fas fa-user-times</icon>
+        <purpose>Визуальное обозначение операции удаления</purpose>
+      </element>
+      <element name="Предупреждающий блок">
+        <type>alert alert-danger</type>
+        <purpose>Привлечение внимания к серьезности действия</purpose>
+      </element>
+      <element name="Информационная панель">
+        <type>user-info</type>
+        <purpose>Отображение данных пользователя для подтверждения</purpose>
+      </element>
+      <element name="Кнопка удаления">
+        <color>danger (красный)</color>
+        <icon>fas fa-trash</icon>
+        <purpose>Явное указание на деструктивное действие</purpose>
+      </element>
+      <element name="Кнопка отмены">
+        <color>outline-secondary (серый)</color>
+        <icon>fas fa-times</icon>
+        <purpose>Безопасная альтернатива отмены операции</purpose>
+      </element>
+    </elements>
+  </userInterface>
+  
+  <businessLogic>
+    <rule name="Подтверждение удаления">
+      <description>Пользователь должен явно подтвердить удаление, видя все данные удаляемого объекта</description>
+      <requirement>mandatory</requirement>
+    </rule>
+    <rule name="Отображение полной информации">
+      <description>Перед удалением показываются все ключевые данные пользователя</description>
+      <fields>ФИО, Email, Телефон, Роль, Дата создания</fields>
+    </rule>
+    <rule name="Необратимость действия">
+      <description>Явное предупреждение о невозможности отмены удаления</description>
+      <warning>Это действие нельзя отменить.</warning>
+    </rule>
+  </businessLogic>
+  
+  <security>
+    <consideration>
+      <type>confirmation</type>
+      <description>Требует явного подтверждения перед выполнением деструктивной операции</description>
+    </consideration>
+    <consideration>
+      <type>id-verification</type>
+      <description>Отображает данные пользователя по ID для предотвращения случайного удаления</description>
+    </consideration>
+  </security>
+  
+  <comparison with="Edit.cshtml">
+    <difference>
+      <aspect>Назначение</aspect>
+      <delete>Подтверждение удаления</delete>
+      <edit>Редактирование данных</edit>
+    </difference>
+    <difference>
+      <aspect>Тон интерфейса</aspect>
+      <delete>Предупреждающий, опасный (красные элементы)</delete>
+      <edit>Нейтральный, информационный</edit>
+    </difference>
+    <difference>
+      <aspect>Формы ввода</aspect>
+      <delete>Нет полей ввода, только отображение данных</delete>
+      <edit>Полная форма с полями для редактирования</delete>
+    </difference>
+    <difference>
+      <aspect>Действия</aspect>
+      <delete>Удалить/Отмена (деструктивное действие)</delete>
+      <edit>Сохранить/Отмена (конструктивное действие)</delete>
+    </difference>
+  </comparison>
+</view>

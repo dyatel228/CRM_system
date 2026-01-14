@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<controller name="DealsController" namespace="CRM.Web.Controllers">
+  <summary>Контроллер для управления сущностями "Сделка" (CRUD операции)</summary>
+  <dependencies>
+    <dependency type="service" name="DatabaseService" />
+  </dependencies>
+  <methods>
+    <method name="Index" httpMethod="GET">
+      <summary>Получает список всех сделок и передает его в представление</summary>
+      <returns>Представление со списком сделок (Views/Deals/Index.cshtml)</returns>
+    </method>
+    <method name="Create" httpMethod="GET">
+      <summary>Отображает форму для создания новой сделки</summary>
+      <returns>Форма создания сделки (Views/Deals/Create.cshtml)</returns>
+      <note>Заполняет ViewBag списками клиентов и пользователей для выбора</note>
+    </method>
+    <method name="Create" httpMethod="POST">
+      <summary>Принимает данные из формы и создает новую сделку в базе данных</summary>
+      <param name="deal" type="Deal">Объект сделки, заполненный данными из формы</param>
+      <returns>Перенаправление на Index при успехе, повторное отображение формы при ошибке</returns>
+    </method>
+    <method name="Edit" httpMethod="GET">
+      <summary>Отображает форму для редактирования существующей сделки</summary>
+      <param name="id" type="long">ID редактируемой сделки</param>
+      <returns>Форма редактирования сделки (Views/Deals/Edit.cshtml)</returns>
+      <note>Если сделка с таким ID не найден, возвращает NotFound()</note>
+    </method>
+    <method name="Edit" httpMethod="POST">
+      <summary>Принимает обновленные данные и сохраняет изменения сделки</summary>
+      <param name="id" type="long">ID сделки, данные которой обновляются</param>
+      <param name="deal" type="Deal">Объект с обновленными данными сделки</param>
+      <returns>Перенаправление на Index при успехе, повторное отображение формы при ошибке</returns>
+    </method>
+    <method name="Delete" httpMethod="GET">
+      <summary>Отображает страницу подтверждения удаления сделки</summary>
+      <param name="id" type="long">ID сделки для удаления</param>
+      <returns>Страница подтверждения удаления (Views/Deals/Delete.cshtml)</returns>
+      <note>Если сделка с таким ID не найден, возвращает NotFound()</note>
+    </method>
+    <method name="DeleteConfirmed" httpMethod="POST">
+      <summary>Выполняет удаление сделки из базы данных</summary>
+      <param name="id" type="long">ID сделки для удаления</param>
+      <returns>Перенаправление на Index после удаления</returns>
+      <note>Вызывается из формы подтверждения удаления</note>
+    </method>
+    <method name="PopulateViewBags" httpMethod="PRIVATE">
+      <summary>Вспомогательный метод для заполнения ViewBag списками клиентов и пользователей</summary>
+      <note>Вызывается в методах Create и Edit для заполнения выпадающих списков</note>
+    </method>
+  </methods>
+</controller>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Edit" path="Views/Users/Edit.cshtml" controller="UsersController" action="Edit">
+  <summary>Форма редактирования существующего пользователя системы с предзаполненными данными</summary>
+  
+  <model type="CRM.Web.Models.User">
+    <summary>Модель пользователя с текущими данными для редактирования</summary>
+    <note>Все поля формы предзаполняются значениями из модели</note>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Редактирование пользователя">
+      <summary>Заголовок страницы редактирования</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Users/Edit/@Model.Id">
+    <hiddenFields>
+      <field name="Id" value="@Model.Id">
+        <summary>Скрытое поле с ID пользователя для идентификации в базе данных</summary>
+      </field>
+    </hiddenFields>
+    
+    <validation>
+      <displayErrors condition="!ViewData.ModelState.IsValid">
+        <container type="div" class="alert alert-danger">
+          <summary>Отображение ошибок валидации после POST-запроса</summary>
+          <loop collection="ViewData.ModelState.Values.SelectMany(v => v.Errors)" item="error">
+            <element type="p">@error.ErrorMessage</element>
+          </loop>
+        </container>
+      </displayErrors>
+    </validation>
+    
+    <fieldGroups>
+      <!-- Группа полей ФИО -->
+      <fieldGroup name="fio" layout="row" columns="3">
+        <field name="LastName" type="text" required="true">
+          <label>Фамилия</label>
+          <value>@Model.LastName</value>
+          <columnSize>col-md-4</columnSize>
+          <note>Обязательное поле</note>
+        </field>
+        
+        <field name="FirstName" type="text" required="true">
+          <label>Имя</label>
+          <value>@Model.FirstName</value>
+          <columnSize>col-md-4</columnSize>
+          <note>Обязательное поле</note>
+        </field>
+        
+        <field name="Patronymic" type="text" required="false">
+          <label>Отчество</label>
+          <value>@Model.Patronymic</value>
+          <columnSize>col-md-4</columnSize>
+          <note>Необязательное поле</note>
+        </field>
+      </fieldGroup>
+      
+      <!-- Группа полей контактов -->
+      <fieldGroup name="contacts" layout="row" columns="2">
+        <field name="Email" type="email" required="true">
+          <label>Email</label>
+          <value>@Model.Email</value>
+          <columnSize>col-md-6</columnSize>
+          <validation>
+            <cssClass condition="ViewData.ModelState[&quot;Email&quot;]?.Errors?.Any() == true">
+              <normal>form-control</normal>
+              <error>form-control is-invalid</error>
+            </cssClass>
+            <errorDisplay condition="ViewData.ModelState[&quot;Email&quot;]?.Errors?.Any() == true">
+              <container type="div" class="invalid-feedback">
+                <content>@ViewData.ModelState["Email"].Errors.First().ErrorMessage</content>
+              </container>
+            </errorDisplay>
+          </validation>
+          <note>Обязательное поле, уникальное в системе</note>
+        </field>
+        
+        <field name="Phone" type="tel" required="false">
+          <label>Телефон</label>
+          <value>@Model.Phone</value>
+          <columnSize>col-md-6</columnSize>
+          <note>Необязательное поле</note>
+        </field>
+      </fieldGroup>
+      
+      <!-- Поле роли -->
+      <fieldGroup name="role" layout="single">
+        <field name="Role" type="select" required="false">
+          <label>Роль</label>
+          <options>
+            <option value="менеджер" selected="@(Model.Role == &quot;менеджер&quot;)">
+              <label>Менеджер</label>
+            </option>
+            <option value="Администратор" selected="@(Model.Role == &quot;Администратор&quot;)">
+              <label>Администратор</label>
+            </option>
+            <option value="Аналитик" selected="@(Model.Role == &quot;Аналитик&quot;)">
+              <label>Аналитик</label>
+            </option>
+          </options>
+          <note>Текущая роль пользователя выбрана по умолчанию</note>
+        </field>
+      </fieldGroup>
+    </fieldGroups>
+    
+    <actions>
+      <action type="submit" class="btn btn-primary">
+        <icon>fas fa-save</icon>
+        <label>Сохранить</label>
+        <summary>Сохраняет изменения данных пользователя</summary>
+      </action>
+      <action type="cancel" href="/Users" class="btn btn-outline-secondary">
+        <icon>fas fa-times</icon>
+        <label>Отмена</label>
+        <summary>Возвращает к списку пользователей без сохранения</summary>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Предзаполнение данных">
+      <summary>Все поля формы автоматически заполняются текущими данными пользователя</summary>
+    </feature>
+    <feature name="Скрытый идентификатор">
+      <summary>ID пользователя передается в скрытом поле для корректного обновления в БД</summary>
+    </feature>
+    <feature name="Динамическая валидация Email">
+      <summary>Поле Email выделяется при ошибках валидации с отображением сообщения</summary>
+    </feature>
+    <feature name="Сохранение выбора роли">
+      <summary>В выпадающем списке выбрана текущая роль пользователя</summary>
+    </feature>
+  </features>
+  
+  <differences from="Create.cshtml">
+    <difference>
+      <field>Заголовок страницы</field>
+      <create>Добавление пользователя</create>
+      <edit>Редактирование пользователя</edit>
+    </difference>
+    <difference>
+      <field>Иконка заголовка</field>
+      <create>fa-user-plus</create>
+      <edit>fa-user-edit</edit>
+    </difference>
+    <difference>
+      <field>Действие формы</field>
+      <create>/Users/Create</create>
+      <edit>/Users/Edit/@Model.Id</edit>
+    </difference>
+    <difference>
+      <field>Скрытое поле Id</field>
+      <create>Отсутствует</create>
+      <edit>Присутствует</edit>
+    </difference>
+    <difference>
+      <field>Значения полей</field>
+      <create>Пустые или значения по умолчанию</create>
+      <edit>Предзаполнены текущими данными</edit>
+    </difference>
+    <difference>
+      <field>Текст кнопки отправки</field>
+      <create>Создать</create>
+      <edit>Сохранить</edit>
+    </difference>
+  </differences>
+</view>

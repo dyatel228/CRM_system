@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model name="User" namespace="CRM.Web.Models">
+  <summary>Сущность пользователя (сотрудника) системы</summary>
+  <properties>
+    <property name="Id" type="long"><summary>Уникальный идентификатор пользователя</summary></property>
+    <property name="LastName" type="string"><summary>Фамилия</summary></property>
+    <property name="FirstName" type="string"><summary>Имя</summary></property>
+    <property name="Patronymic" type="string"><summary>Отчество (необязательно)</summary></property>
+    <property name="Email" type="string"><summary>Адрес электронной почты (логин)</summary></property>
+    <property name="Phone" type="string"><summary>Номер телефона</summary></property>
+    <property name="Role" type="string"><summary>Роль в системе (например, "Менеджер", "Администратор")</summary></property>
+    <property name="CreatedDate" type="DateTime"><summary>Дата регистрации</summary></property>
+  </properties>
+  <methods>
+    <method name="GetFullName">
+      <summary>Возвращает полное имя пользователя в формате "Фамилия Имя Отчество"</summary>
+    </method>
+  </methods>
+</model>

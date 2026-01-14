@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Index" path="Views/Users/Index.cshtml" controller="UsersController" action="Index">
+  <summary>Представление для отображения списка всех пользователей системы с возможностями управления</summary>
+  
+  <model type="IEnumerable&lt;CRM.Web.Models.User&gt;">
+    <summary>Коллекция объектов User для отображения в таблице</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Пользователи">
+      <summary>Заголовок страницы в браузере</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <header type="div" class="d-flex justify-content-between align-items-center mb-4">
+        <element type="h1" class="form-title">
+          <icon>fas fa-users</icon>
+          <content>Пользователи</content>
+        </element>
+        <element type="a" href="/Users/Create" class="btn btn-primary">
+          <icon>fas fa-user-plus</icon>
+          <content>Добавить пользователя</content>
+        </element>
+      </header>
+      
+      <conditional if="!Model.Any()">
+        <element type="div" class="empty-table">
+          <icon>fas fa-users-slash</icon>
+          <content>Пользователи не найдены</content>
+          <action type="a" href="/Users/Create" class="btn btn-primary">
+            <icon>fas fa-user-plus</icon>
+            <content>Добавить первого пользователя</content>
+          </action>
+        </element>
+      </conditional>
+      
+      <conditional if="Model.Any()">
+        <element type="div" class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <column name="ФИО">ФИО</column>
+                <column name="Email">Email</column>
+                <column name="Телефон">Телефон</column>
+                <column name="Роль">Роль</column>
+                <column name="Дата создания">Дата создания</column>
+                <column name="Действия" class="text-center">Действия</column>
+              </tr>
+            </thead>
+            <tbody>
+              <foreach collection="Model" item="item">
+                <tr>
+                  <td>
+                    <strong>@item.GetFullName()</strong>
+                  </td>
+                  <td>
+                    <icon>fas fa-envelope text-primary</icon> @item.Email
+                  </td>
+                  <td>
+                    <icon>fas fa-phone text-success</icon> @item.Phone
+                  </td>
+                  <td>
+                    <switch expression="item.Role">
+                      <case value="Администратор">
+                        <badge class="bg-danger">@item.Role</badge>
+                      </case>
+                      <case value="менеджер">
+                        <badge class="bg-primary">@item.Role</badge>
+                      </case>
+                      <case value="Менеджер">
+                        <badge class="bg-primary">@item.Role</badge>
+                      </case>
+                      <case value="Аналитик">
+                        <badge class="bg-info">@item.Role</badge>
+                      </case>
+                      <default>
+                        <badge class="bg-secondary">@item.Role</badge>
+                      </default>
+                    </switch>
+                  </td>
+                  <td>
+                    <span class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</span>
+                  </td>
+                  <td>
+                    <div class="table-actions">
+                      <action type="a" href="/Users/Edit/@item.Id" class="btn btn-sm btn-warning">
+                        <icon>fas fa-edit</icon>
+                        <tooltip>Редактировать</tooltip>
+                      </action>
+                      <action type="a" href="/Users/Delete/@item.Id" class="btn btn-sm btn-danger">
+                        <icon>fas fa-trash</icon>
+                        <tooltip>Удалить</tooltip>
+                      </action>
+                    </div>
+                  </td>
+                </tr>
+              </foreach>
+            </tbody>
+          </table>
+        </element>
+      </conditional>
+    </container>
+  </structure>
+  
+  <features>
+    <feature name="Адаптивная таблица">
+      <summary>Таблица адаптируется под размер экрана (используется Bootstrap table-responsive)</summary>
+    </feature>
+    <feature name="Условное отображение">
+      <summary>Показывает разные блоки в зависимости от наличия пользователей в базе</summary>
+    </feature>
+    <feature name="Цветовая индикация ролей">
+      <summary>Роли пользователей выделены цветными значками (badge) для быстрой идентификации</summary>
+      <color role="Администратор" class="bg-danger">Красный</color>
+      <color role="менеджер/Менеджер" class="bg-primary">Синий</color>
+      <color role="Аналитик" class="bg-info">Голубой</color>
+    </feature>
+    <feature name="Иконки Font Awesome">
+      <summary>Используются иконки Font Awesome для визуального улучшения интерфейса</summary>
+    </feature>
+  </features>
+  
+  <actions>
+    <action type="create" href="/Users/Create" class="btn btn-primary">
+      <summary>Переход к созданию нового пользователя</summary>
+    </action>
+    <action type="edit" href="/Users/Edit/{id}" class="btn btn-sm btn-warning">
+      <summary>Редактирование пользователя по ID</summary>
+    </action>
+    <action type="delete" href="/Users/Delete/{id}" class="btn btn-sm btn-danger">
+      <summary>Удаление пользователя по ID (подтверждение)</summary>
+    </action>
+  </actions>
+</view>

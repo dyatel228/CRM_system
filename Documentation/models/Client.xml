@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model name="Client" namespace="CRM.Web.Models">
+  <summary>Сущность клиента компании в CRM-системе</summary>
+  <properties>
+    <property name="Id" type="long"><summary>Уникальный идентификатор клиента</summary></property>
+    <property name="CompanyName" type="string"><summary>Название компании</summary></property>
+    <property name="ContactPerson" type="string"><summary>Контактное лицо</summary></property>
+    <property name="Phone" type="string"><summary>Телефон</summary></property>
+    <property name="Email" type="string"><summary>Email</summary></property>
+    <property name="Address" type="string"><summary>Адрес</summary></property>
+    <property name="CreatedDate" type="DateTime"><summary>Дата создания записи</summary></property>
+    <property name="ResponsibleUserId" type="long"><summary>ID ответственного менеджера (пользователя)</summary></property>
+  </properties>
+</model>

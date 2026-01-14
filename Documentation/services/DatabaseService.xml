@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service name="DatabaseService" namespace="CRM.Web.Services">
+  <summary>Основной сервис для выполнения операций с базой данных (Data Access Layer)</summary>
+  <dependencies>
+    <dependency type="library" name="Npgsql.EntityFrameworkCore.PostgreSQL" version="8.0.0" />
+  </dependencies>
+  <methods>
+    <!-- Работа с клиентами -->
+    <method name="GetAllClientsAsync">
+      <summary>Асинхронно получает всех клиентов из базы данных</summary>
+      <returns>Список объектов Client</returns>
+    </method>
+    <method name="GetClientByIdAsync">
+      <summary>Асинхронно находит клиента по его ID</summary>
+      <param name="id" type="long">ID искомого клиента</param>
+      <returns>Объект Client или null, если не найден</returns>
+    </method>
+    <method name="AddClientAsync">
+      <summary>Асинхронно добавляет нового клиента в базу данных</summary>
+      <param name="client" type="Client">Объект нового клиента</param>
+    </method>
+    <method name="UpdateClientAsync">
+      <summary>Асинхронно обновляет данные существующего клиента</summary>
+      <param name="client" type="Client">Объект клиента с обновленными данными</param>
+    </method>
+    <method name="DeleteClientAsync">
+      <summary>Асинхронно удаляет клиента по его ID</summary>
+      <param name="id" type="long">ID клиента для удаления</param>
+    </method>
+    <method name="GetClientsForDropdownAsync">
+      <summary>Асинхронно получает упрощенный список клиентов (ID и название компании) для выпадающих списков</summary>
+      <returns>Список объектов, содержащих Id и CompanyName</returns>
+    </method>
+    <!-- Работа со сделками -->
+    <method name="GetAllDealsAsync">
+      <summary>Асинхронно получает все сделки из базы данных</summary>
+      <returns>Список объектов Deal</returns>
+    </method>
+    <method name="GetDealByIdAsync">
+      <summary>Асинхронно находит сделку по ее ID</summary>
+      <param name="id" type="long">ID искомой сделки</param>
+      <returns>Объект Deal или null, если не найдена</returns>
+    </method>
+    <method name="AddDealAsync">
+      <summary>Асинхронно добавляет новую сделку в базу данных</summary>
+      <param name="deal" type="Deal">Объект новой сделки</param>
+    </method>
+    <method name="UpdateDealAsync">
+      <summary>Асинхронно обновляет данные существующей сделки</summary>
+      <param name="deal" type="Deal">Объект сделки с обновленными данными</param>
+    </method>
+    <method name="DeleteDealAsync">
+      <summary>Асинхронно удаляет сделку по ее ID</summary>
+      <param name="id" type="long">ID сделки для удаления</param>
+    </method>
+    <!-- Работа с пользователями -->
+    <method name="GetUsersForDropdownAsync">
+      <summary>Асинхронно получает упрощенный список пользователей (ID и фамилию) для выпадающих списков</summary>
+      <returns>Список объектов, содержащих Id и LastName</returns>
+    </method>
+  </methods>
+</controller>

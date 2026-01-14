@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<controller name="UsersController" namespace="CRM.Web.Controllers">
+  <summary>Контроллер для управления пользователями системы</summary>
+  <dependencies>
+    <dependency type="service" name="DatabaseService" />
+  </dependencies>
+  <methods>
+    <method name="Index" httpMethod="GET">
+      <summary>Получает список всех пользователей системы</summary>
+      <returns>Представление со списком пользователей (Views/Users/Index.cshtml)</returns>
+    </method>
+    <method name="Create" httpMethod="GET">
+      <summary>Отображает форму для создания нового пользователя</summary>
+      <returns>Форма создания пользователя (Views/Users/Create.cshtml)</returns>
+    </method>
+    <method name="Create" httpMethod="POST">
+      <summary>Принимает данные из формы и создает нового пользователя в базе данных</summary>
+      <param name="user" type="User">Объект пользователя из формы</param>
+      <returns>Перенаправление на Index при успехе</returns>
+    </method>
+    <method name="Edit" httpMethod="GET">
+      <summary>Отображает форму для редактирования существующего пользователя</summary>
+      <param name="id" type="long">ID редактируемого пользователя</param>
+      <returns>Форма редактирования пользователя (Views/Users/Edit.cshtml)</returns>
+    </method>
+    <method name="Edit" httpMethod="POST">
+      <summary>Сохраняет изменения данных пользователя</summary>
+      <param name="id" type="long">ID пользователя</param>
+      <param name="user" type="User">Обновленный объект пользователя</param>
+      <returns>Перенаправление на Index при успехе</returns>
+    </method>
+    <method name="Delete" httpMethod="GET">
+      <summary>Запрашивает подтверждение на удаление пользователя</summary>
+      <param name="id" type="long">ID пользователя для удаления</param>
+      <returns>Страница подтверждения удаления (Views/Users/Delete.cshtml)</returns>
+    </method>
+    <method name="DeleteConfirmed" httpMethod="POST">
+      <summary>Выполняет удаление пользователя из системы</summary>
+      <param name="id" type="long">ID пользователя для удаления</param>
+      <returns>Перенаправление на Index после удаления</returns>
+    </method>
+  </methods>
+</controller>

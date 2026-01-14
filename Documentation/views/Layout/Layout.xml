@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="_Layout" path="Views/Shared/_Layout.cshtml">
+  <summary>Основной макет (layout) для всех страниц CRM-системы, содержащий общую структуру HTML, навигацию и подключение ресурсов</summary>
+  
+  <doctype>HTML5</doctype>
+  <language>ru</language>
+  
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      <template>@ViewData["Title"] - CRM System</template>
+      <example>Главная - CRM System</example>
+    </title>
+    
+    <stylesheets>
+      <stylesheet href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+        <framework>Bootstrap 5.1.3</framework>
+        <purpose>CSS-фреймворк для стилизации и адаптивности</purpose>
+      </stylesheet>
+      <stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <library>Font Awesome 6.4.0</library>
+        <purpose>Иконки для улучшения пользовательского интерфейса</purpose>
+      </stylesheet>
+      <stylesheet href="~/css/site.css" asp-append-version="true">
+        <type>Custom CSS</type>
+        <purpose>Собственные стили проекта</purpose>
+        <cacheBusting>asp-append-version="true"</cacheBusting>
+      </stylesheet>
+    </stylesheets>
+  </head>
+  
+  <body>
+    <wrapper class="wrapper">
+      <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+          <container class="container">
+            <brand class="navbar-brand" href="/">
+              <icon>fas fa-chart-line</icon>
+              <text>CRM System</text>
+            </brand>
+            
+            <mobileToggle class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+              <icon class="navbar-toggler-icon"></icon>
+            </mobileToggle>
+            
+            <navbarCollapse class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+              <navigationList class="navbar-nav flex-grow-1">
+                <item class="nav-item">
+                  <link class="nav-link" href="/">
+                    <icon>fas fa-home</icon>
+                    <text>Главная</text>
+                  </link>
+                </item>
+                <item class="nav-item">
+                  <link class="nav-link" href="/Users">
+                    <icon>fas fa-users</icon>
+                    <text>Пользователи</text>
+                    <colorScheme>primary (синий)</colorScheme>
+                  </link>
+                </item>
+                <item class="nav-item">
+                  <link class="nav-link" href="/Clients">
+                    <icon>fas fa-building</icon>
+                    <text>Клиенты</text>
+                    <colorScheme>success (зеленый)</colorScheme>
+                  </link>
+                </item>
+                <item class="nav-item">
+                  <link class="nav-link" href="/Deals">
+                    <icon>fas fa-handshake</icon>
+                    <text>Сделки</text>
+                    <colorScheme>warning (желтый)</colorScheme>
+                  </link>
+                </item>
+              </navigationList>
+            </navbarCollapse>
+          </container>
+        </nav>
+      </header>
+      
+      <mainContent class="container main-content">
+        <main role="main" class="pb-3">
+          <renderBody>@RenderBody()</renderBody>
+          <purpose>Место для вставки содержимого конкретных страниц</purpose>
+        </main>
+      </mainContent>
+      
+      <footer class="footer">
+        <container class="container">
+          <!-- Пустой футер, может быть заполнен по мере необходимости -->
+        </container>
+      </footer>
+    </wrapper>
+    
+    <scripts>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+        <library>jQuery 3.6.0</library>
+        <purpose>Библиотека для упрощения работы с DOM и AJAX</purpose>
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js">
+        <framework>Bootstrap JavaScript (включая Popper.js)</framework>
+        <purpose>Интерактивные компоненты Bootstrap (модальные окна, dropdowns и т.д.)</purpose>
+      </script>
+      <script src="~/js/site.js" asp-append-version="true">
+        <type>Custom JavaScript</type>
+        <purpose>Собственные скрипты проекта</purpose>
+        <cacheBusting>asp-append-version="true"</cacheBusting>
+      </script>
+    </scripts>
+  </body>
+</view>
+
+<technicalDetails>
+  <responsiveDesign>
+    <feature name="Mobile-first approach">
+      <implementation>Bootstrap 5 с классами navbar-expand-sm</implementation>
+      <behavior>Навигация сворачивается в гамбургер-меню на экранах меньше sm (≥576px)</behavior>
+    </feature>
+    <feature name="Viewport meta tag">
+      <content>width=device-width, initial-scale=1.0</content>
+      <purpose>Корректное отображение на мобильных устройствах</purpose>
+    </feature>
+  </responsiveDesign>
+  
+  <navigationStructure>
+    <item href="/" icon="fa-home" text="Главная">
+      <controller>HomeController</controller>
+      <action>Index</action>
+    </item>
+    <item href="/Users" icon="fa-users" text="Пользователи">
+      <controller>UsersController</controller>
+      <action>Index</action>
+      <colorTheme>primary</colorTheme>
+    </item>
+    <item href="/Clients" icon="fa-building" text="Клиенты">
+      <controller>ClientsController</controller>
+      <action>Index</action>
+      <colorTheme>success</colorTheme>
+    </item>
+    <item href="/Deals" icon="fa-handshake" text="Сделки">
+      <controller>DealsController</controller>
+      <action>Index</action>
+      <colorTheme>warning</colorTheme>
+    </item>
+  </navigationStructure>
+  
+  <resourceManagement>
+    <cdnResources>
+      <resource type="CSS" url="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+      <resource type="CSS" url="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      <resource type="JS" url="https://code.jquery.com/jquery-3.6.0.min.js" />
+      <resource type="JS" url="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" />
+    </cdnResources>
+    <localResources>
+      <resource type="CSS" path="~/css/site.css" cacheBusting="true" />
+      <resource type="JS" path="~/js/site.js" cacheBusting="true" />
+    </localResources>
+    <cacheStrategy>
+      <technique>asp-append-version="true"</technique>
+      <purpose>Автоматическое добавление версии к файлам для обновления кэша браузера</purpose>
+    </cacheStrategy>
+  </resourceManagement>
+  
+  <layoutComponents>
+    <component name="Навигационная панель">
+      <type>Bootstrap navbar</type>
+      <features>Адаптивное меню, брендинг, цветовые схемы разделов</features>
+    </component>
+    <component name="Основное содержимое">
+      <container>Bootstrap container</container>
+      <purpose>Центрирование и ограничение ширины контента</purpose>
+    </component>
+    <component name="Подвал">
+      <currentState>Пустой (заготовка для будущего наполнения)</currentState>
+    </component>
+  </layoutComponents>
+  
+  <bootstrapFeatures>
+    <feature name="Navbar">
+      <classes>navbar, navbar-expand-sm, navbar-toggleable-sm</classes>
+    </feature>
+    <feature name="Container">
+      <classes>container (фиксированная ширина с отступами)</classes>
+    </feature>
+    <feature name="Spacing">
+      <classes>mb-3 (margin-bottom), pb-3 (padding-bottom)</classes>
+    </feature>
+    <feature name="Flexbox">
+      <classes>d-sm-inline-flex, justify-content-between, flex-grow-1</classes>
+    </feature>
+  </bootstrapFeatures>
+</technicalDetails>

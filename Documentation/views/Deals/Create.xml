@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Create" path="Views/Deals/Create.cshtml" controller="DealsController" action="Create">
+  <summary>Форма создания новой сделки с выбором клиента, менеджера, указанием суммы и стадии выполнения</summary>
+  
+  <viewData>
+    <data key="Title" value="Добавление сделки">
+      <summary>Заголовок страницы создания сделки</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Deals/Create">
+    <!-- Основное поле: Название сделки -->
+    <fieldGroup name="dealInfo" layout="single">
+      <field name="DealName" type="text" required="true">
+        <label>Название сделки</label>
+        <placeholder>Введите название сделки</placeholder>
+        <validation>
+          <required>true</required>
+        </validation>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: Клиент и менеджер -->
+    <fieldGroup name="participants" layout="row" columns="2">
+      <field name="ClientId" type="select" required="true">
+        <label>Клиент</label>
+        <placeholder>Выберите клиента</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <validation>
+          <required>true</required>
+        </validation>
+        <optionsSource>ViewBag.Clients</optionsSource>
+        <options>
+          <option value="" default="true">
+            <label>Выберите клиента</label>
+          </option>
+          <dynamicOptions collection="ViewBag.Clients" item="client">
+            <option value="@client.Id">
+              <label>@client.CompanyName</label>
+            </option>
+          </dynamicOptions>
+        </options>
+      </field>
+      
+      <field name="ResponsibleUserId" type="select" required="false">
+        <label>Ответственный менеджер</label>
+        <placeholder>Не назначен</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <optionsSource>ViewBag.Users</optionsSource>
+        <options>
+          <option value="" default="true">
+            <label>Не назначен</label>
+          </option>
+          <dynamicOptions collection="ViewBag.Users" item="user">
+            <option value="@user.Id">
+              <label>@user.LastName @user.FirstName</label>
+            </option>
+          </dynamicOptions>
+        </options>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: Сумма и стадия -->
+    <fieldGroup name="dealDetails" layout="row" columns="2">
+      <field name="Amount" type="number" required="true">
+        <label>Сумма (₽)</label>
+        <placeholder>0.00</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <validation>
+          <required>true</required>
+          <min>0</min>
+          <step>0.01</step>
+        </validation>
+        <format>Десятичное число с двумя знаками после запятой</format>
+        <currency>₽ (российский рубль)</currency>
+      </field>
+      
+      <field name="Stage" type="select" required="false">
+        <label>Стадия</label>
+        <columnSize>col-md-6</columnSize>
+        <options>
+          <option value="Переговоры" default="true">
+            <label>Переговоры</label>
+            <description>Начальная стадия, обсуждение условий</description>
+          </option>
+          <option value="Оформление">
+            <label>Оформление</label>
+            <description>Подготовка документов, формальное оформление</description>
+          </option>
+          <option value="Закрыта">
+            <label>Закрыта</label>
+            <description>Успешно завершенная сделка</description>
+          </option>
+          <option value="Отменена">
+            <label>Отменена</label>
+            <description>Отмененная или сорванная сделка</description>
+          </option>
+        </options>
+        <note>По умолчанию: "Переговоры"</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле: Срок исполнения -->
+    <fieldGroup name="deadline" layout="single">
+      <field name="DeadlineDate" type="date" required="false">
+        <label>Срок исполнения</label>
+        <note>Опциональная дата планируемого завершения сделки</note>
+      </field>
+    </fieldGroup>
+    
+    <actions>
+      <action type="submit" class="btn btn-warning">
+        <icon>fas fa-save</icon>
+        <label>Создать сделку</label>
+      </action>
+      <action type="cancel" href="/Deals" class="btn btn-outline-secondary">
+        <icon>fas fa-arrow-left</icon>
+        <label>Назад к списку</label>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Динамические выпадающие списки">
+      <summary>Списки клиентов и пользователей заполняются из ViewBag</summary>
+      <dataSource>ViewBag.Clients, ViewBag.Users</dataSource>
+      <population>Методом PopulateViewBags в контроллере</population>
+    </feature>
+    <feature name="Валидация суммы">
+      <summary>Поле суммы имеет тип number с ограничениями min="0" и step="0.01"</summary>
+      <constraints>Только положительные числа, два знака после запятой</constraints>
+    </feature>
+    <feature name="HTML5 элемент date">
+      <summary>Используется нативный элемент input type="date" для выбора даты</summary>
+      <browserSupport>Современные браузеры показывают календарь для выбора</browserSupport>
+    </feature>
+    <feature name="Семантическая группировка">
+      <summary>Поля сгруппированы по смыслу: участники, детали сделки, сроки</summary>
+    </feature>
+  </features>
+  
+  <businessRules>
+    <rule field="DealName">
+      <required>true</required>
+    </rule>
+    <rule field="ClientId">
+      <required>true</required>
+      <foreignKey>Clients(Id)</foreignKey>
+    </rule>
+    <rule field="Amount">
+      <required>true</required>
+      <type>decimal</type>
+      <min>0</min>
+      <format>0.00</format>
+    </rule>
+    <rule field="Stage">
+      <defaultValue>Переговоры</defaultValue>
+      <allowedValues>
+        <value>Переговоры</value>
+        <value>Оформление</value>
+        <value>Закрыта</value>
+        <value>Отменена</value>
+      </allowedValues>
+    </rule>
+    <rule field="DeadlineDate">
+      <required>false</required>
+      <type>date</type>
+      <nullable>true</nullable>
+    </rule>
+  </businessRules>
+  
+  <comparison with="clients_create.xml">
+    <difference>
+      <aspect>Обязательные поля</aspect>
+      <deals>DealName, ClientId, Amount</deals>
+      <clients>Только CompanyName</clients>
+    </difference>
+    <difference>
+      <aspect>Динамические списки</aspect>
+      <deals>Клиенты и пользователи из ViewBag</deals>
+      <clients>Нет динамических списков</clients>
+    </difference>
+    <difference>
+      <aspect>Типы полей</aspect>
+      <deals>number (сумма), date (срок), select (связи)</deals>
+      <clients>text, textarea, select (статус)</clients>
+    </difference>
+    <difference>
+      <aspect>Цветовая схема</aspect>
+      <deals>Желтая тема (btn-warning, fa-handshake)</deals>
+      <clients>Зеленая тема (btn-success, fa-user-tie)</clients>
+    </difference>
+  </comparison>
+  
+  <dataModelInsights>
+    <insight>
+      <field>ResponsibleUserId</field>
+      <note>В форме называется ResponsibleUserId, но в списке сделок отображается как ManagerId. Возможно, это одно поле с разными именами.</note>
+    </insight>
+    <insight>
+      <field>DeadlineDate</field>
+      <type>DateTime?</type>
+      <htmlType>date</htmlType>
+      <note>HTML5 input type="date" преобразуется в DateTime в модели</note>
+    </insight>
+    <insight>
+      <field>ViewBag связи</field>
+      <source>ClientsController.PopulateViewBags()</source>
+      <purpose>Заполнение выпадающих списков клиентов и пользователей</purpose>
+    </insight>
+  </dataModelInsights>
+</view>

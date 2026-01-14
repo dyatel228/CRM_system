@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model name="Deal" namespace="CRM.Web.Models">
+  <summary>Сущность сделки между компанией и клиентом</summary>
+  <properties>
+    <property name="Id" type="long"><summary>Уникальный идентификатор сделки</summary></property>
+    <property name="Title" type="string"><summary>Название сделки</summary></property>
+    <property name="Description" type="string"><summary>Подробное описание</summary></property>
+    <property name="Amount" type="decimal"><summary>Сумма сделки</summary></property>
+    <property name="Status" type="string"><summary>Текущий статус (например, "В работе", "Завершена")</summary></property>
+    <property name="ClientId" type="long"><summary>ID связанного клиента</summary></property>
+    <property name="ManagerId" type="long"><summary>ID ответственного менеджера</summary></property>
+  </properties>
+</model>

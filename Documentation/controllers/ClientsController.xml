@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<controller name="ClientsController" namespace="CRM.Web.Controllers">
+  <summary>Контроллер для управления сущностями "Клиент" (CRUD операции)</summary>
+  <dependencies>
+    <dependency type="service" name="DatabaseService" />
+  </dependencies>
+  <methods>
+    <method name="Index" httpMethod="GET">
+      <summary>Получает список всех клиентов и передает его в представление</summary>
+      <returns>Представление со списком клиентов (Views/Clients/Index.cshtml)</returns>
+    </method>
+    <method name="Create" httpMethod="GET">
+      <summary>Отображает форму для создания нового клиента</summary>
+      <returns>Форма создания клиента (Views/Clients/Create.cshtml)</returns>
+      <note>Заполняет ViewBag списком пользователей для выбора ответственного</note>
+    </method>
+    <method name="Create" httpMethod="POST">
+      <summary>Принимает данные из формы и создает нового клиента в базе данных</summary>
+      <param name="client" type="Client">Объект клиента, заполненный данными из формы</param>
+      <returns>Перенаправление на Index при успехе, повторное отображение формы при ошибке</returns>
+    </method>
+    <method name="Edit" httpMethod="GET">
+      <summary>Отображает форму для редактирования существующего клиента</summary>
+      <param name="id" type="long">ID редактируемого клиента</param>
+      <returns>Форма редактирования клиента (Views/Clients/Edit.cshtml)</returns>
+      <note>Если клиент с таким ID не найден, возвращает NotFound()</note>
+    </method>
+    <method name="Edit" httpMethod="POST">
+      <summary>Принимает обновленные данные и сохраняет изменения клиента</summary>
+      <param name="id" type="long">ID клиента, данные которого обновляются</param>
+      <param name="client" type="Client">Объект с обновленными данными клиента</param>
+      <returns>Перенаправление на Index при успехе, повторное отображение формы при ошибке</returns>
+    </method>
+    <method name="Delete" httpMethod="GET">
+      <summary>Отображает страницу подтверждения удаления клиента</summary>
+      <param name="id" type="long">ID клиента для удаления</param>
+      <returns>Страница подтверждения удаления (Views/Clients/Delete.cshtml)</returns>
+      <note>Если клиент с таким ID не найден, возвращает NotFound()</note>
+    </method>
+    <method name="DeleteConfirmed" httpMethod="POST">
+      <summary>Выполняет удаление клиента из базы данных</summary>
+      <param name="id" type="long">ID клиента для удаления</param>
+      <returns>Перенаправление на Index после удаления</returns>
+      <note>Вызывается из формы подтверждения удаления</note>
+    </method>
+  </methods>
+</controller>

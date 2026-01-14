@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Index" path="Views/Home/Index.cshtml" controller="HomeController" action="Index">
+  <summary>Главная (стартовая) страница CRM-системы с навигацией по основным разделам и быстрым добавлением данных</summary>
+  
+  <viewData>
+    <data key="Title" value="Главная">
+      <summary>Заголовок главной страницы</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <!-- Секция: Добавление данных -->
+      <section name="data-addition" class="mt-5 mb-3">
+        <heading type="h3" class="mt-5 mb-3">Добавление данных</heading>
+        <grid type="row">
+          <column size="col-md-4 mb-3">
+            <action type="a" href="/Users/Create" class="btn btn-primary btn-block">
+              <icon>fas fa-user-plus</icon>
+              <label>Добавить сотрудника</label>
+              <category>users</category>
+              <colorScheme>primary (синий)</colorScheme>
+            </action>
+          </column>
+          <column size="col-md-4 mb-3">
+            <action type="a" href="/Clients/Create" class="btn btn-success btn-block">
+              <icon>fas fa-user-tie</icon>
+              <label>Добавить клиента</label>
+              <category>clients</category>
+              <colorScheme>success (зеленый)</colorScheme>
+            </action>
+          </column>
+          <column size="col-md-4 mb-3">
+            <action type="a" href="/Deals/Create" class="btn btn-warning btn-block">
+              <icon>fas fa-handshake</icon>
+              <label>Добавить сделку</label>
+              <category>deals</category>
+              <colorScheme>warning (желтый)</colorScheme>
+            </action>
+          </column>
+        </grid>
+        <purpose>
+          <summary>Быстрый доступ к формам создания основных сущностей системы</summary>
+        </purpose>
+      </section>
+      
+      <!-- Секция: Навигация -->
+      <section name="navigation" class="mt-5 mb-3">
+        <heading type="h3" class="mt-5 mb-3">Навигация</heading>
+        <grid type="row">
+          <column size="col-md-4 text-center mb-3">
+            <action type="a" href="/Users" class="btn btn-outline-primary">
+              <icon>fas fa-users fa-2x mb-2</icon>
+              <br/>
+              <label>Управление пользователями</label>
+              <category>users</category>
+              <style>outline</style>
+              <iconSize>fa-2x (увеличенная иконка)</iconSize>
+            </action>
+          </column>
+          <column size="col-md-4 text-center mb-3">
+            <action type="a" href="/Clients" class="btn btn-outline-success">
+              <icon>fas fa-building fa-2x mb-2</icon>
+              <br/>
+              <label>Управление клиентами</label>
+              <category>clients</category>
+              <style>outline</style>
+              <iconSize>fa-2x (увеличенная иконка)</iconSize>
+            </action>
+          </column>
+          <column size="col-md-4 text-center mb-3">
+            <action type="a" href="/Deals" class="btn btn-outline-warning">
+              <icon>fas fa-handshake fa-2x mb-2</icon>
+              <br/>
+              <label>Управление сделками</label>
+              <category>deals</category>
+              <style>outline</style>
+              <iconSize>fa-2x (увеличенная иконка)</iconSize>
+            </action>
+          </column>
+        </grid>
+        <purpose>
+          <summary>Переход к спискам сущностей для управления существующими записями</summary>
+        </purpose>
+      </section>
+    </container>
+  </structure>
+  
+  <designPatterns>
+    <pattern name="Цветовая кодировка разделов">
+      <description>Каждый раздел системы имеет свою цветовую схему для быстрой идентификации</description>
+      <mapping>
+        <section name="Пользователи" color="primary" icon="fa-users">Синий</section>
+        <section name="Клиенты" color="success" icon="fa-building">Зеленый</section>
+        <section name="Сделки" color="warning" icon="fa-handshake">Желтый</section>
+      </mapping>
+    </pattern>
+    <pattern name="Двойной доступ">
+      <description>Для каждой сущности предоставлены два типа доступа: создание новой и управление существующими</description>
+      <implementation>
+        <type name="Добавление">
+          <style>filled buttons (btn-primary, btn-success, btn-warning)</style>
+          <iconSize>normal</iconSize>
+          <layout>inline</layout>
+        </type>
+        <type name="Управление">
+          <style>outline buttons (btn-outline-*)</style>
+          <iconSize>fa-2x (крупные иконки)</iconSize>
+          <layout>centered with line break</layout>
+        </type>
+      </implementation>
+    </pattern>
+    <pattern nameАдаптивная сетка">
+      <description>Используется Bootstrap grid system с колонками col-md-4 для отзывчивого дизайна</description>
+      <behavior>На мобильных устройствах кнопки располагаются вертикально</behavior>
+    </pattern>
+  </designPatterns>
+  
+  <navigationMatrix>
+    <destination name="Добавление сотрудника" href="/Users/Create">
+      <icon>fa-user-plus</icon>
+      <color>btn-primary</color>
+      <section>Добавление данных</section>
+    </destination>
+    <destination name="Добавление клиента" href="/Clients/Create">
+      <icon>fa-user-tie</icon>
+      <color>btn-success</color>
+      <section>Добавление данных</section>
+    </destination>
+    <destination name="Добавление сделки" href="/Deals/Create">
+      <icon>fa-handshake</icon>
+      <color>btn-warning</color>
+      <section>Добавление данных</section>
+    </destination>
+    <destination name="Управление пользователями" href="/Users">
+      <icon>fa-users (fa-2x)</icon>
+      <color>btn-outline-primary</color>
+      <section>Навигация</section>
+    </destination>
+    <destination name="Управление клиентами" href="/Clients">
+      <icon>fa-building (fa-2x)</icon>
+      <color>btn-outline-success</color>
+      <section>Навигация</section>
+    </destination>
+    <destination name="Управление сделками" href="/Deals">
+      <icon>fa-handshake (fa-2x)</icon>
+      <color>btn-outline-warning</color>
+      <section>Навигация</section>
+    </destination>
+  </navigationMatrix>
+  
+  <userExperience>
+    <principle name="Быстрый старт">
+      <description>Пользователь сразу видит основные действия и может начать работу без поиска</description>
+    </principle>
+    <principle name="Визуальная иерархия">
+      <description>Разделы четко отделены друг от друга заголовками и интервалами</description>
+    </principle>
+    <principle name="Консистентность">
+      <description>Цветовые схемы соответствуют разделам системы во всех представлениях</description>
+    </principle>
+  </userExperience>
+  
+  <comparison with="otherIndexViews">
+    <difference>
+      <aspect>Модель данных</aspect>
+      <home>Нет модели (статическая страница)</home>
+      <users>IEnumerable&lt;User&gt;</users>
+      <clients>IEnumerable&lt;Client&gt;</clients>
+      <deals>IEnumerable&lt;Deal&gt;</deals>
+    </difference>
+    <difference>
+      <aspect>Основное содержание</aspect>
+      <home>Навигационные ссылки</home>
+      <users>Таблица пользователей</users>
+      <clients>Таблица клиентов</clients>
+      <deals>Таблица сделок</deals>
+    </difference>
+    <difference>
+      <aspect>Интерактивность</aspect>
+      <home>Только ссылки</home>
+      <users>CRUD операции с данными</users>
+      <clients>CRUD операции с данными</clients>
+      <deals>CRUD операции с данными</deals>
+    </difference>
+  </comparison>
+  
+  <accessibility>
+    <feature name="Семантические заголовки">
+      <description>Используются теги h3 для структурирования контента</description>
+    </feature>
+    <feature name="Достаточный контраст">
+      <description>Цветовые схемы обеспечивают хорошую читаемость</description>
+    </feature>
+    <feature name="Логический порядок фокуса">
+      <description>Навигация организована в логическом порядке слева направо</description>
+    </feature>
+  </accessibility>
+</view>

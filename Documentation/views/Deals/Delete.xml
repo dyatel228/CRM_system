@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Delete" path="Views/Deals/Delete.cshtml" controller="DealsController" action="Delete">
+  <summary>Страница подтверждения удаления сделки с отображением финансовой информации, стадии и сроков</summary>
+  
+  <model type="CRM.Web.Models.Deal">
+    <summary>Модель сделки для отображения полной информации перед удалением</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Удаление сделки">
+      <summary>Заголовок страницы подтверждения удаления</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <container type="div" class="form-container">
+        <header type="h1" class="form-title">
+          <icon>fas fa-handshake</icon>
+          <content>Удаление сделки</content>
+        </header>
+        
+        <!-- Блок предупреждения -->
+        <warning type="div" class="alert alert-danger">
+          <heading type="h4">Вы уверены, что хотите удалить эту сделку?</heading>
+          <message type="p">Это действие нельзя отменить.</message>
+          <importance>high</importance>
+          <irreversible>true</irreversible>
+        </warning>
+        
+        <!-- Информация о сделке -->
+        <infoSection type="div" class="deal-info">
+          <heading type="h4">Информация о сделке:</heading>
+          <fields>
+            <field name="Название">
+              <value>@Model.DealName</value>
+              <importance>high</importance>
+            </field>
+            <field name="Клиент ID">
+              <value>@Model.ClientId</value>
+              <note>Отображается только ID, без названия компании</note>
+            </field>
+            <field name="Сумма">
+              <value>
+                <amount type="span" class="badge bg-success">
+                  <value>@Model.Amount.ToString("N2") ₽</value>
+                  <format>N2 (два десятичных знака)</format>
+                  <currency>₽</currency>
+                </amount>
+              </value>
+              <visual>color-coded-badge (зеленый)</visual>
+            </field>
+            <field name="Стадия">
+              <value>
+                <badge class="bg-primary">@Model.Stage</badge>
+              </value>
+              <visual>color-coded-badge (синий)</visual>
+            </field>
+            <field name="Срок исполнения" conditional="true">
+              <condition>Model.DeadlineDate.HasValue</condition>
+              <content>
+                <value>@Model.DeadlineDate.Value.ToString("dd.MM.yyyy")</value>
+                <format>dd.MM.yyyy</format>
+              </content>
+              <note>Отображается только если срок указан</note>
+            </field>
+            <field name="Дата создания">
+              <value>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</value>
+              <format>dd.MM.yyyy HH:mm</format>
+              <note>Полный формат даты и времени создания</note>
+            </field>
+          </fields>
+          <purpose>
+            <summary>Отображение ключевых данных сделки для принятия осознанного решения об удалении</summary>
+          </purpose>
+        </infoSection>
+        
+        <!-- Форма действий -->
+        <actions type="div" class="form-actions">
+          <!-- Форма удаления -->
+          <form method="post" action="/Deals/Delete/@Model.Id" style="display: inline;">
+            <hiddenFields>
+              <field name="Id" value="@Model.Id">
+                <summary>ID сделки передается в POST-запросе</summary>
+              </field>
+            </hiddenFields>
+            <action type="submit" class="btn btn-danger">
+              <icon>fas fa-trash</icon>
+              <label>Удалить</label>
+              <confirmation>implicit</confirmation>
+              <irreversible>true</irreversible>
+            </action>
+          </form>
+          
+          <!-- Кнопка отмены -->
+          <action type="cancel" href="/Deals" class="btn btn-outline-secondary">
+            <icon>fas fa-times</icon>
+            <label>Отмена</label>
+            <safe>true</safe>
+          </action>
+        </actions>
+      </container>
+    </container>
+  </structure>
+  
+  <userInterface>
+    <elements>
+      <element name="Заголовок с иконкой">
+        <icon>fas fa-handshake</icon>
+        <purpose>Визуальная связь с разделом сделок</purpose>
+      </element>
+      <element name="Предупреждающий блок">
+        <type>alert alert-danger</type>
+        <purpose>Привлечение внимания к серьезности финансовой операции</purpose>
+      </element>
+      <element name="Информационная панель сделки">
+        <type>deal-info</type>
+        <fieldsCount>5-6 (в зависимости от наличия срока)</fieldsCount>
+        <purpose>Отображение финансовых и временных параметров сделки</purpose>
+      </element>
+      <element name="Форматирование денежной суммы">
+        <format>N2 с символом рубля</format>
+        <visual>Зеленый бейдж</visual>
+      </element>
+      <element name="Условное отображение срока">
+        <logic>Model.DeadlineDate.HasValue</logic>
+        <purpose>Срок показывается только если был указан</purpose>
+      </element>
+    </elements>
+  </userInterface>
+  
+  <businessLogic>
+    <rule name="Отображение финансовых данных">
+      <description>Сумма сделки всегда отображается с форматированием валюты</description>
+      <format>ToString("N2") ₽</format>
+      <visual>badge bg-success</visual>
+    </rule>
+    <rule name="Условное отображение срока">
+      <description>Срок исполнения показывается только если он был указан при создании</description>
+      <condition>Model.DeadlineDate.HasValue</condition>
+      <format>dd.MM.yyyy</format>
+    </rule>
+    <rule name="Идентификация клиента">
+      <description>Клиент идентифицируется только по ID, без названия компании</description>
+      <display>@Model.ClientId</display>
+      <note>В отличие от форм, где показывается название компании</note>
+    </rule>
+    <rule name="Необратимость действия">
+      <description>Явное предупреждение о невозможности отмены удаления финансовой записи</description>
+    </rule>
+  </businessLogic>
+  
+  <comparison with="clients_delete.xml">
+    <difference>
+      <aspect>Финансовая информация</aspect>
+      <deals>Сумма с валютой (₽)</deals>
+      <clients>ИНН компании</clients>
+    </difference>
+    <difference>
+      <aspect>Идентификация связанных сущностей</aspect>
+      <deals>Только ClientId (без названия компании)</deals>
+      <clients>Полная информация о компании</clients>
+    </difference>
+    <difference>
+      <aspect>Условные поля</aspect>
+      <deals>Срок исполнения (если указан)</deals>
+      <clients>ИНН и Адрес (если указаны)</clients>
+    </difference>
+    <difference>
+      <aspect>Цвет бейджей</aspect>
+      <deals>bg-success (сумма), bg-primary (стадия)</deals>
+      <clients>bg-primary (статус)</clients>
+    </difference>
+  </comparison>
+  
+  <comparison with="deals_edit.xml">
+    <difference>
+      <aspect>Назначение</aspect>
+      <delete>Подтверждение удаления (деструктивное)</delete>
+      <edit>Редактирование данных (конструктивное)</delete>
+    </difference>
+    <difference>
+      <aspect>Формат отображения ClientId</aspect>
+      <delete>Только ID: @Model.ClientId</delete>
+      <edit>Выпадающий список с названиями компаний</delete>
+    </difference>
+    <difference>
+      <aspect>Формат даты создания</aspect>
+      <delete>dd.MM.yyyy HH:mm (с временем)</delete>
+      <edit>Не отображается в форме редактирования</delete>
+    </difference>
+    <difference>
+      <aspect>Отсутствующие поля</aspect>
+      <delete>Нет ResponsibleUserId и Description</delete>
+      <edit>Все поля сделки доступны для редактирования</delete>
+    </difference>
+  </comparison>
+  
+  <security>
+    <consideration>
+      <type>financial-data-protection</type>
+      <description>Удаление финансовых записей требует дополнительного подтверждения</description>
+    </consideration>
+    <consideration>
+      <type>data-integrity</type>
+      <description>Удаление сделок может повлиять на финансовую отчетность</description>
+    </consideration>
+  </security>
+  
+  <missingInformation>
+    <field name="ResponsibleUserId">
+      <note>Не отображается на странице удаления, хотя присутствует в модели</note>
+    </field>
+    <field name="ClientCompanyName">
+      <note>Отображается только ClientId без названия компании для идентификации</note>
+    </field>
+  </missingInformation>
+</view>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="CRM_Database">
+  <summary>Логическая схема базы данных CRM-системы на основе кода моделей</summary>
+  <tables>
+    <table name="Clients">
+      <summary>Хранит информацию о клиентах (компаниях)</summary>
+      <columns>
+        <column name="Id" type="bigint" primaryKey="true" autoIncrement="true"><summary>Первичный ключ</summary></column>
+        <column name="CompanyName" type="varchar(200)" nullable="false"><summary>Название компании</summary></column>
+        <column name="ContactPerson" type="varchar(150)" nullable="false"><summary>Контактное лицо</summary></column>
+        <column name="Phone" type="varchar(20)" nullable="false"><summary>Телефон</summary></column>
+        <column name="Email" type="varchar(100)" nullable="false" unique="true"><summary>Email адрес</summary></column>
+        <column name="Address" type="varchar(500)" nullable="true"><summary>Физический адрес</summary></column>
+        <column name="CreatedDate" type="timestamp" nullable="false" default="CURRENT_TIMESTAMP"><summary>Дата создания записи</summary></column>
+        <column name="ResponsibleUserId" type="bigint" nullable="false" foreignKey="Users(Id)"><summary>Внешний ключ на таблицу Users</summary></column>
+      </columns>
+      <indexes>
+        <index name="IX_Clients_ResponsibleUserId" columns="ResponsibleUserId" />
+      </indexes>
+    </table>
+    <table name="Deals">
+      <summary>Хранит информацию о сделках</summary>
+      <columns>
+        <column name="Id" type="bigint" primaryKey="true" autoIncrement="true"><summary>Первичный ключ</summary></column>
+        <column name="Title" type="varchar(200)" nullable="false"><summary>Название сделки</summary></column>
+        <column name="Description" type="text" nullable="true"><summary>Подробное описание</summary></column>
+        <column name="Amount" type="decimal(18,2)" nullable="false"><summary>Сумма сделки</summary></column>
+        <column name="Status" type="varchar(50)" nullable="false" default="'В работе'"><summary>Статус сделки</summary></column>
+        <column name="ClientId" type="bigint" nullable="false" foreignKey="Clients(Id)"><summary>Внешний ключ на таблицу Clients</summary></column>
+        <column name="ManagerId" type="bigint" nullable="false" foreignKey="Users(Id)"><summary>Внешний ключ на таблицу Users</summary></column>
+      </columns>
+      <indexes>
+        <index name="IX_Deals_ClientId" columns="ClientId" />
+        <index name="IX_Deals_ManagerId" columns="ManagerId" />
+      </indexes>
+    </table>
+    <table name="Users">
+      <summary>Хранит информацию о пользователях системы</summary>
+      <columns>
+        <column name="Id" type="bigint" primaryKey="true" autoIncrement="true"><summary>Первичный ключ</summary></column>
+        <column name="LastName" type="varchar(100)" nullable="false"><summary>Фамилия</summary></column>
+        <column name="FirstName" type="varchar(100)" nullable="false"><summary>Имя</summary></column>
+        <column name="Patronymic" type="varchar(100)" nullable="true"><summary>Отчество</summary></column>
+        <column name="Email" type="varchar(255)" nullable="false" unique="true"><summary>Email (логин)</summary></column>
+        <column name="Phone" type="varchar(20)" nullable="true"><summary>Телефон</summary></column>
+        <column name="Role" type="varchar(50)" nullable="false" default="'Менеджер'"><summary>Роль в системе</summary></column>
+        <column name="CreatedDate" type="timestamp" nullable="false" default="CURRENT_TIMESTAMP"><summary>Дата регистрации</summary></column>
+      </columns>
+    </table>
+  </tables>
+</database>

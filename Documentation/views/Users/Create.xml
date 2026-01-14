@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Create" path="Views/Users/Create.cshtml" controller="UsersController" action="Create">
+  <summary>Форма создания нового пользователя системы с валидацией данных</summary>
+  
+  <model type="CRM.Web.Models.User">
+    <summary>Модель пользователя для предзаполнения формы (при повторном отображении после ошибки)</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Добавление пользователя">
+      <summary>Заголовок страницы создания пользователя</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Users/Create">
+    <validation>
+      <displayErrors condition="!ViewData.ModelState.IsValid">
+        <container type="div" class="alert alert-danger">
+          <summary>Отображение всех ошибок валидации модели</summary>
+          <loop collection="ViewData.ModelState.Values.SelectMany(v => v.Errors)" item="error">
+            <element type="p">@error.ErrorMessage</element>
+          </loop>
+        </container>
+      </displayErrors>
+    </validation>
+    
+    <fieldGroups>
+      <!-- Группа полей ФИО -->
+      <fieldGroup name="fio" layout="row" columns="3">
+        <field name="LastName" type="text" required="true">
+          <label>Фамилия</label>
+          <placeholder>Введите фамилию</placeholder>
+          <maxLength>100</maxLength>
+          <value>@(Model?.LastName ?? "")</value>
+          <columnSize>col-md-4</columnSize>
+        </field>
+        
+        <field name="FirstName" type="text" required="true">
+          <label>Имя</label>
+          <placeholder>Введите имя</placeholder>
+          <maxLength>100</maxLength>
+          <value>@(Model?.FirstName ?? "")</value>
+          <columnSize>col-md-4</columnSize>
+        </field>
+        
+        <field name="Patronymic" type="text" required="false">
+          <label>Отчество</label>
+          <placeholder>Введите отчество</placeholder>
+          <maxLength>100</maxLength>
+          <value>@(Model?.Patronymic ?? "")</value>
+          <columnSize>col-md-4</columnSize>
+          <note>Необязательное поле</note>
+        </field>
+      </fieldGroup>
+      
+      <!-- Группа полей контактов -->
+      <fieldGroup name="contacts" layout="row" columns="2">
+        <field name="Email" type="email" required="true">
+          <label>Email</label>
+          <placeholder>example@email.com</placeholder>
+          <maxLength>255</maxLength>
+          <value>@(Model?.Email ?? "")</value>
+          <columnSize>col-md-6</columnSize>
+          <validation>
+            <cssClass condition="ViewData.ModelState[&quot;Email&quot;]?.Errors?.Any() == true">
+              <normal>form-control</normal>
+              <error>form-control is-invalid</error>
+            </cssClass>
+            <errorDisplay condition="ViewData.ModelState[&quot;Email&quot;]?.Errors?.Any() == true">
+              <container type="div" class="invalid-feedback">
+                <content>@ViewData.ModelState["Email"].Errors.First().ErrorMessage</content>
+              </container>
+            </errorDisplay>
+          </validation>
+        </field>
+        
+        <field name="Phone" type="tel" required="false">
+          <label>Телефон</label>
+          <placeholder>+7 (XXX) XXX-XX-XX</placeholder>
+          <maxLength>20</maxLength>
+          <value>@(Model?.Phone ?? "")</value>
+          <columnSize>col-md-6</columnSize>
+          <note>Необязательное поле</note>
+        </field>
+      </fieldGroup>
+      
+      <!-- Поле роли -->
+      <fieldGroup name="role" layout="single">
+        <field name="Role" type="select" required="false">
+          <label>Роль</label>
+          <options>
+            <option value="менеджер" default="true" selected="@(Model?.Role == &quot;менеджер&quot; || Model == null)">
+              <label>Менеджер</label>
+            </option>
+            <option value="Администратор" selected="@(Model?.Role == &quot;Администратор&quot;)">
+              <label>Администратор</label>
+            </option>
+            <option value="Аналитик" selected="@(Model?.Role == &quot;Аналитик&quot;)">
+              <label>Аналитик</label>
+            </option>
+          </options>
+          <note>По умолчанию: "менеджер"</note>
+        </field>
+      </fieldGroup>
+    </fieldGroups>
+    
+    <actions>
+      <action type="submit" class="btn btn-primary">
+        <icon>fas fa-save</icon>
+        <label>Создать</label>
+      </action>
+      <action type="cancel" href="/Users" class="btn btn-outline-secondary">
+        <icon>fas fa-arrow-left</icon>
+        <label>Назад к списку</label>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Валидация на стороне клиента">
+      <summary>Используются HTML5 атрибуты required, maxlength для базовой валидации</summary>
+    </feature>
+    <feature name="Серверная валидация">
+      <summary>Отображение ошибок валидации модели после POST-запроса</summary>
+    </feature>
+    <feature name="Динамическая валидация Email">
+      <summary>Поле Email подсвечивается красным и показывает ошибку при невалидном значении</summary>
+    </feature>
+    <feature name="Сохранение введенных данных">
+      <summary>При ошибке валидации форма сохраняет введенные пользователем данные</summary>
+    </feature>
+    <feature name="Адаптивный дизайн">
+      <summary>Используется Bootstrap grid system (row, col-md-*) для адаптивности</summary>
+    </feature>
+  </features>
+  
+  <businessRules>
+    <rule field="LastName">
+      <required>true</required>
+      <maxLength>100</maxLength>
+    </rule>
+    <rule field="FirstName">
+      <required>true</required>
+      <maxLength>100</maxLength>
+    </rule>
+    <rule field="Email">
+      <required>true</required>
+      <type>email</type>
+      <maxLength>255</maxLength>
+      <unique>true</unique>
+    </rule>
+    <rule field="Role">
+      <defaultValue>менеджер</defaultValue>
+      <allowedValues>
+        <value>менеджер</value>
+        <value>Администратор</value>
+        <value>Аналитик</value>
+      </allowedValues>
+    </rule>
+  </businessRules>
+</view>

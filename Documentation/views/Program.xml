@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application name="Program" path="Program.cs" type="EntryPoint">
+  <summary>Точка входа и конфигурация приложения ASP.NET Core для CRM-системы</summary>
+  
+  <namespace>CRM.Web</namespace>
+  <entryPoint>Program.Main (неявно)</entryPoint>
+  <framework>ASP.NET Core 8.0</framework>
+  
+  <structure>
+    <!-- Импорты -->
+    <imports>
+      <import namespace="CRM.Web.Services">
+        <purpose>Доступ к DatabaseService для регистрации в DI-контейнере</purpose>
+      </import>
+    </imports>
+    
+    <!-- Создание билдера приложения -->
+    <step name="CreateBuilder">
+      <code>WebApplicationBuilder builder = WebApplication.CreateBuilder(args);</code>
+      <purpose>Создание билдера для конфигурации приложения</purpose>
+      <configSources>
+        <source>appsettings.json</source>
+        <source>appsettings.{Environment}.json</source>
+        <source>Environment variables</source>
+        <source>Command-line arguments</source>
+      </configSources>
+    </step>
+    
+    <!-- Конфигурация сервисов (DI Container) -->
+    <step name="ConfigureServices">
+      <section name="MVC с поддержкой Razor Runtime Compilation">
+        <code>builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();</code>
+        <components>
+          <component>Controllers</component>
+          <component>Views</component>
+          <component>Razor Pages</component>
+        </components>
+        <feature name="Razor Runtime Compilation">
+          <enabled>true</enabled>
+          <purpose>Автоматическая перекомпиляция Razor-представлений при изменении без перезапуска приложения</purpose>
+          <package>Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation</package>
+        </feature>
+      </section>
+      
+      <section name="Регистрация DatabaseService">
+        <code>builder.Services.AddScoped&lt;DatabaseService&gt;();</code>
+        <lifetime>Scoped</lifetime>
+        <description>Создается новый экземпляр для каждого HTTP-запроса</description>
+        <implementation>CRM.Web.Services.DatabaseService</implementation>
+      </section>
+    </step>
+    
+    <!-- Построение приложения -->
+    <step name="BuildApplication">
+      <code>WebApplication app = builder.Build();</code>
+      <purpose>Создание экземпляра приложения на основе сконфигурированного билдера</purpose>
+    </step>
+    
+    <!-- Конфигурация конвейера HTTP-запросов (Middleware Pipeline) -->
+    <step name="ConfigurePipeline">
+      <section name="Обработка ошибок в Production">
+        <condition>!app.Environment.IsDevelopment()</condition>
+        <middlewares>
+          <middleware name="Exception Handler">
+            <code>app.UseExceptionHandler("/Home/Error");</code>
+            <purpose>Перехват необработанных исключений и перенаправление на страницу ошибки</purpose>
+            <route>/Home/Error</route>
+          </middleware>
+          <middleware name="HTTP Strict Transport Security">
+            <code>app.UseHsts();</code>
+            <purpose>Включает HSTS (HTTP Strict Transport Security) для принудительного использования HTTPS</purpose>
+            <duration>По умолчанию 30 дней (настраивается в конфигурации)</duration>
+          </middleware>
+        </middlewares>
+      </section>
+      
+      <section name="Базовые middleware (все среды)">
+        <middleware name="HTTPS Redirection">
+          <code>app.UseHttpsRedirection();</code>
+          <purpose>Автоматическое перенаправление HTTP-запросов на HTTPS</purpose>
+        </middleware>
+        <middleware name="Static Files">
+          <code>app.UseStaticFiles();</code>
+          <purpose>Обслуживание статических файлов из wwwroot (CSS, JS, изображения)</purpose>
+          <path>wwwroot/</path>
+        </middleware>
+        <middleware name="Routing">
+          <code>app.UseRouting();</code>
+          <purpose>Маршрутизация запросов к соответствующим контроллерам и действиям</purpose>
+        </middleware>
+        <middleware name="Authorization">
+          <code>app.UseAuthorization();</code>
+          <purpose>Проверка авторизации для защищенных маршрутов</purpose>
+          <note>Хотя в текущей реализации нет явной авторизации, middleware зарегистрирован для будущего использования</note>
+        </middleware>
+      </section>
+      
+      <section name="Настройка маршрутов по умолчанию">
+        <code>
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+        </code>
+        <routeDefinition>
+          <name>default</name>
+          <pattern>{controller=Home}/{action=Index}/{id?}</pattern>
+          <defaults>
+            <controller>Home</controller>
+            <action>Index</action>
+            <id optional="true" />
+          </defaults>
+          <examples>
+            <example url="/">→ HomeController.Index()</example>
+            <example url="/Users">→ UsersController.Index()</example>
+            <example url="/Clients/Edit/5">→ ClientsController.Edit(5)</example>
+          </examples>
+        </routeDefinition>
+      </section>
+    </step>
+    
+    <!-- Запуск приложения -->
+    <step name="RunApplication">
+      <code>app.Run();</code>
+      <purpose>Запуск приложения и начало прослушивания HTTP-запросов</purpose>
+    </step>
+  </structure>
+  
+  <environmentConfiguration>
+    <development>
+      <features>
+        <feature name="Razor Runtime Compilation" enabled="true" />
+        <feature name="Detailed Error Pages" enabled="true" />
+        <feature name="HSTS" enabled="false" />
+      </features>
+    </development>
+    <production>
+      <features>
+        <feature name="Exception Handler" enabled="true" />
+        <feature name="HSTS" enabled="true" />
+      </features>
+    </production>
+  </environmentConfiguration>
+  
+  <dependencyInjection>
+    <services>
+      <service type="DatabaseService" lifetime="Scoped">
+        <implementation>CRM.Web.Services.DatabaseService</implementation>
+        <registrationMethod>AddScoped</registrationMethod>
+      </service>
+      <service type="ControllersWithViews" lifetime="Singleton">
+        <registrationMethod>AddControllersWithViews</registrationMethod>
+        <extensions>AddRazorRuntimeCompilation</extensions>
+      </service>
+    </services>
+  </dependencyInjection>
+  
+  <securityFeatures>
+    <feature name="HTTPS Enforcement">
+      <middleware>UseHttpsRedirection</middleware>
+      <purpose>Все HTTP-запросы перенаправляются на HTTPS</purpose>
+    </feature>
+    <feature name="HSTS">
+      <middleware>UseHsts</middleware>
+      <environment>Production only</environment>
+      <purpose>Браузеры запоминают, что сайт должен использовать только HTTPS</purpose>
+    </feature>
+    <feature name="Authorization Middleware">
+      <middleware>UseAuthorization</middleware>
+      <purpose>Подготовка для будущей реализации системы авторизации</purpose>
+    </feature>
+  </securityFeatures>
+  
+  <fileStructure>
+    <relatedFiles>
+      <file name="appsettings.json" type="Configuration">
+        <purpose>Основной файл конфигурации приложения</purpose>
+      </file>
+      <file name="appsettings.Development.json" type="Configuration">
+        <purpose>Конфигурация для среды разработки</purpose>
+      </file>
+      <file name="CRM.web.csproj" type="Project">
+        <purpose>Файл проекта с зависимостями и настройками</purpose>
+      </file>
+    </relatedFiles>
+  </fileStructure>
+  
+  <notes>
+    <note>
+      <content>Приложение использует минимальный API шаблон ASP.NET Core (без Startup.cs)</content>
+      <version>.NET 6+</version>
+    </note>
+    <note>
+      <content>В проекте используется PostgreSQL через Npgsql, но конфигурация подключения к БД не показана в Program.cs</content>
+      <assumption>Подключение к БД настраивается в DatabaseService или appsettings.json</assumption>
+    </note>
+    <note>
+      <content>Отсутствует явная регистрация DbContext, вероятно DatabaseService инкапсулирует всю работу с БД</content>
+    </note>
+  </notes>
+</application>

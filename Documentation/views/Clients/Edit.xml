@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Edit" path="Views/Clients/Edit.cshtml" controller="ClientsController" action="Edit">
+  <summary>Форма редактирования существующего клиента с предзаполненными данными и возможностью изменения статуса взаимоотношений</summary>
+  
+  <model type="CRM.Web.Models.Client">
+    <summary>Модель клиента с текущими данными для редактирования</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Редактирование клиента">
+      <summary>Заголовок страницы редактирования клиента</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Clients/Edit/@Model.Id">
+    <hiddenFields>
+      <field name="Id" value="@Model.Id">
+        <summary>Скрытое поле с ID клиента для идентификации в базе данных</summary>
+      </field>
+    </hiddenFields>
+    
+    <!-- Основное поле компании -->
+    <fieldGroup name="company" layout="single">
+      <field name="CompanyName" type="text" required="true">
+        <label>Название компании</label>
+        <value>@Model.CompanyName</value>
+        <validation>
+          <required>true</required>
+        </validation>
+        <note>Единственное обязательное поле в форме</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: ИНН и телефон -->
+    <fieldGroup name="identifiers" layout="row" columns="2">
+      <field name="INN" type="text" required="false">
+        <label>ИНН</label>
+        <value>@Model.INN</value>
+        <columnSize>col-md-6</columnSize>
+        <note>Идентификационный номер налогоплательщика</note>
+      </field>
+      
+      <field name="Phone" type="tel" required="false">
+        <label>Телефон</label>
+        <value>@Model.Phone</value>
+        <columnSize>col-md-6</columnSize>
+        <note>Контактный телефон компании</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Email -->
+    <fieldGroup name="email" layout="single">
+      <field name="Email" type="email" required="false">
+        <label>Email</label>
+        <value>@Model.Email</value>
+        <validation>
+          <type>email</type>
+        </validation>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Адрес -->
+    <fieldGroup name="address" layout="single">
+      <field name="Address" type="textarea" required="false">
+        <label>Адрес</label>
+        <value>@Model.Address</value>
+        <rows>3</rows>
+        <note>Многострочное поле для полного адреса компании</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Статус -->
+    <fieldGroup name="status" layout="single">
+      <field name="Status" type="select" required="false">
+        <label>Статус</label>
+        <options>
+          <option value="Лид" selected="@(Model.Status == &quot;Лид&quot;)">
+            <label>Лид</label>
+          </option>
+          <option value="Активный" selected="@(Model.Status == &quot;Активный&quot;)">
+            <label>Активный</label>
+          </option>
+          <option value="Неактивный" selected="@(Model.Status == &quot;Неактивный&quot;)">
+            <label>Неактивный</label>
+          </option>
+          <option value="Отказ" selected="@(Model.Status == &quot;Отказ&quot;)">
+            <label>Отказ</label>
+          </option>
+        </options>
+        <note>Текущий статус клиента выбран по умолчанию</note>
+      </field>
+    </fieldGroup>
+    
+    <actions>
+      <action type="submit" class="btn btn-success">
+        <icon>fas fa-save</icon>
+        <label>Сохранить</label>
+      </action>
+      <action type="cancel" href="/Clients" class="btn btn-outline-secondary">
+        <icon>fas fa-times</icon>
+        <label>Отмена</label>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Предзаполнение данных">
+      <summary>Все поля формы автоматически заполняются текущими данными клиента</summary>
+    </feature>
+    <feature name="Динамический выбор статуса">
+      <summary>В выпадающем списке статусов автоматически выбирается текущий статус клиента</summary>
+      <logic>selected="@(Model.Status == "Значение")"</logic>
+    </feature>
+    <feature name="Сохранение идентификатора">
+      <summary>ID клиента передается в скрытом поле для корректного обновления в БД</summary>
+    </feature>
+    <feature name="Консистентность данных">
+      <summary>Форма использует те же поля и структуру, что и форма создания</summary>
+    </feature>
+  </features>
+  
+  <differences from="clients_create.xml">
+    <difference>
+      <field>Заголовок и иконка</field>
+      <create>Добавление клиента (fa-user-tie)</create>
+      <edit>Редактирование клиента (fa-user-edit)</edit>
+    </difference>
+    <difference>
+      <field>Действие формы</field>
+      <create>/Clients/Create</create>
+      <edit>/Clients/Edit/@Model.Id</edit>
+    </difference>
+    <difference>
+      <field>Скрытое поле Id</field>
+      <create>Отсутствует</create>
+      <edit>Присутствует со значением @Model.Id</edit>
+    </difference>
+    <difference>
+      <field>Значения полей</field>
+      <create>Пустые поля с placeholder</create>
+      <edit>Предзаполнены значениями @Model.FieldName</edit>
+    </difference>
+    <difference>
+      <field>Логика выбора статуса</field>
+      <create>По умолчанию "Лид"</create>
+      <edit>Выбор текущего статуса клиента</edit>
+    </difference>
+    <difference>
+      <field>Текст кнопки отправки</field>
+      <create>Создать клиента</create>
+      <edit>Сохранить</edit>
+    </difference>
+  </differences>
+  
+  <dataIntegrity>
+    <rule>
+      <name>Сохранение обязательных полей</name>
+      <description>Поле CompanyName остается обязательным при редактировании</description>
+    </rule>
+    <rule>
+      <name>Идентификация записи</name>
+      <description>ID клиента обязательно передается для правильного обновления</description>
+    </rule>
+    <rule>
+      <name>Формат данных</name>
+      <description>Поля Email и Phone сохраняют свои типы (email, tel) для валидации</description>
+    </rule>
+  </dataIntegrity>
+  
+  <userExperience>
+    <aspect name="Предсказуемость">
+      <description>Пользователь видит текущие данные и понимает, что именно будет изменено</description>
+    </aspect>
+    <aspect name="Безопасность">
+      <description>Явное отображение редактируемой записи через ID предотвращает ошибки</description>
+    </aspect>
+    <aspect name="Эффективность">
+      <description>Все поля доступны для редактирования в одной форме</description>
+    </aspect>
+  </userExperience>
+</view>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<controller name="HomeController" namespace="CRM.Web.Controllers">
+  <summary>Контроллер для отображения главных страниц приложения</summary>
+  <methods>
+    <method name="Index" httpMethod="GET">
+      <summary>Отображает главную (стартовую) страницу CRM-системы</summary>
+      <returns>Представление главной страницы (Views/Home/Index.cshtml)</returns>
+    </method>
+    <method name="Privacy" httpMethod="GET">
+      <summary>Отображает страницу с политикой конфиденциальности</summary>
+      <returns>Представление страницы Privacy (Views/Home/Privacy.cshtml)</returns>
+    </method>
+  </methods>
+</controller>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<documentation>
+  <metadata>
+    <project>
+      <name>CRM.web</name>
+      <description>Система управления взаимоотношениями с клиентами</description>
+      <stack>ASP.NET Core 6.0, PostgreSQL, Npgsql, MVC</stack>
+    </project>
+  </metadata>
+  <includes>
+    <!-- Модели (Models) -->
+    <include file="Documentation/models/Client.xml" />
+    <include file="Documentation/models/Deal.xml" />
+    <include file="Documentation/models/User.xml" />
+    <!-- Контроллеры (Controllers) -->
+    <include file="Documentation/controllers/HomeController.xml" />
+    <include file="Documentation/controllers/ClientsController.xml" />
+    <include file="Documentation/controllers/DealsController.xml" />
+    <!-- Сервисы (Services) -->
+    <include file="Documentation/services/DatabaseService.xml" />
+    <!-- Схема базы данных -->
+    <include file="Documentation/database/schema.xml" />
+  </includes>
+</documentation>

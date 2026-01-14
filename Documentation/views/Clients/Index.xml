@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Index" path="Views/Clients/Index.cshtml" controller="ClientsController" action="Index">
+  <summary>Представление для отображения списка всех клиентов компании с табличным выводом и цветовой индикацией статусов</summary>
+  
+  <model type="IEnumerable&lt;CRM.Web.Models.Client&gt;">
+    <summary>Коллекция объектов Client для отображения в таблице клиентов</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Клиенты">
+      <summary>Заголовок страницы со списком клиентов</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <header type="div" class="d-flex justify-content-between align-items-center mb-4">
+        <element type="h1" class="form-title">
+          <icon>fas fa-building</icon>
+          <content>Клиенты</content>
+        </element>
+        <action type="a" href="/Clients/Create" class="btn btn-success">
+          <icon>fas fa-user-plus</icon>
+          <content>Добавить клиента</content>
+        </action>
+      </header>
+      
+      <conditional if="!Model.Any()">
+        <element type="div" class="empty-table">
+          <icon>fas fa-users-slash</icon>
+          <message>Клиенты не найдены</message>
+          <action type="a" href="/Clients/Create" class="btn btn-success">
+            <icon>fas fa-user-plus</icon>
+            <content>Добавить первого клиента</content>
+          </action>
+        </element>
+      </conditional>
+      
+      <conditional if="Model.Any()">
+        <element type="div" class="table-responsive">
+          <table class="table">
+            <columns>
+              <column name="Компания" width="auto">
+                <header>Компания</header>
+                <content>
+                  <strong>@item.CompanyName</strong>
+                </content>
+              </column>
+              <column name="ИНН" width="auto">
+                <header>ИНН</header>
+                <content>
+                  <conditional if="!string.IsNullOrEmpty(item.INN)">
+                    <element type="span" class="badge bg-info">@item.INN</element>
+                  </conditional>
+                  <conditional if="string.IsNullOrEmpty(item.INN)">
+                    <element type="span" class="text-muted">Не указан</element>
+                  </conditional>
+                </content>
+              </column>
+              <column name="Контакты" width="auto">
+                <header>Контакты</header>
+                <content>
+                  <contact type="email">
+                    <icon>fas fa-envelope</icon>
+                    <value>@item.Email</value>
+                  </contact>
+                  <contact type="phone">
+                    <icon>fas fa-phone</icon>
+                    <value>@item.Phone</value>
+                  </contact>
+                </content>
+              </column>
+              <column name="Адрес" width="auto">
+                <header>Адрес</header>
+                <content>
+                  <conditional if="!string.IsNullOrEmpty(item.Address)">
+                    <element type="span" class="small">@item.Address</element>
+                  </conditional>
+                  <conditional if="string.IsNullOrEmpty(item.Address)">
+                    <element type="span" class="text-muted">Не указан</element>
+                  </conditional>
+                </content>
+              </column>
+              <column name="Статус" width="auto">
+                <header>Статус</header>
+                <content>
+                  <switch expression="item.Status">
+                    <case value="Лид">
+                      <badge class="bg-primary">@item.Status</badge>
+                      <colorMeaning>Первичный контакт</colorMeaning>
+                    </case>
+                    <case value="Активный">
+                      <badge class="bg-success">@item.Status</badge>
+                      <colorMeaning>Работающий клиент</colorMeaning>
+                    </case>
+                    <case value="Неактивный">
+                      <badge class="bg-secondary">@item.Status</badge>
+                      <colorMeaning>Неактивный клиент</colorMeaning>
+                    </case>
+                    <case value="Отказ">
+                      <badge class="bg-danger">@item.Status</badge>
+                      <colorMeaning>Отказался от сотрудничества</colorMeaning>
+                    </case>
+                    <default>
+                      <badge class="bg-warning">@item.Status</badge>
+                      <colorMeaning>Неизвестный статус</colorMeaning>
+                    </default>
+                  </switch>
+                </content>
+              </column>
+              <column name="Дата создания" width="auto">
+                <header>Дата создания</header>
+                <content>
+                  <element type="span" class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</element>
+                  <format>dd.MM.yyyy</format>
+                </content>
+              </column>
+              <column name="Действия" width="auto" class="text-center">
+                <header>Действия</header>
+                <content>
+                  <actions type="div" class="table-actions">
+                    <action type="a" href="/Clients/Edit/@item.Id" class="btn btn-sm btn-warning">
+                      <icon>fas fa-edit</icon>
+                      <tooltip>Редактировать клиента</tooltip>
+                    </action>
+                    <action type="a" href="/Clients/Delete/@item.Id" class="btn btn-sm btn-danger">
+                      <icon>fas fa-trash</icon>
+                      <tooltip>Удалить клиента</tooltip>
+                    </action>
+                  </actions>
+                </content>
+              </column>
+            </columns>
+            
+            <rows>
+              <foreach collection="Model" item="item">
+                <row>
+                  <!-- Данные заполняются согласно колонкам выше -->
+                </row>
+              </foreach>
+            </rows>
+          </table>
+        </element>
+      </conditional>
+    </container>
+  </structure>
+  
+  <features>
+    <feature name="Условное отображение данных">
+      <summary>Пустые поля (ИНН, Адрес) заменяются текстом "Не указан"</summary>
+      <fields>INN, Address</fields>
+    </feature>
+    <feature name="Цветовая индикация статусов">
+      <summary>Статусы клиентов выделены цветом для быстрой визуальной идентификации</summary>
+      <status color="bg-primary" meaning="Лид">Синий - первичный контакт</status>
+      <status color="bg-success" meaning="Активный">Зеленый - активный клиент</status>
+      <status color="bg-secondary" meaning="Неактивный">Серый - неактивный клиент</status>
+      <status color="bg-danger" meaning="Отказ">Красный - отказ от сотрудничества</status>
+      <status color="bg-warning" meaning="default">Желтый - неизвестный статус</status>
+    </feature>
+    <feature name="Адаптивная таблица">
+      <summary>Используется Bootstrap table-responsive для корректного отображения на мобильных устройствах</summary>
+    </feature>
+    <feature name="Двойные контакты">
+      <summary>В одной ячейке отображаются и email, и телефон клиента с иконками</summary>
+    </feature>
+  </features>
+  
+  <dataModelExtensions>
+    <field name="INN">
+      <type>string</type>
+      <nullable>true</nullable>
+      <display>Форматируется как badge bg-info при наличии значения</display>
+    </field>
+    <field name="Status">
+      <type>string</type>
+      <allowedValues>
+        <value>Лид</value>
+        <value>Активный</value>
+        <value>Неактивный</value>
+        <value>Отказ</value>
+      </allowedValues>
+      <defaultColor>bg-warning</defaultColor>
+    </field>
+    <field name="CreatedDate">
+      <format display="dd.MM.yyyy">Только дата без времени</format>
+    </field>
+  </dataModelExtensions>
+  
+  <comparison with="users_index.xml">
+    <difference>
+      <aspect>Иконка заголовка</aspect>
+      <clients>fa-building (здание)</clients>
+      <users>fa-users (люди)</users>
+    </difference>
+    <difference>
+      <aspect>Цвет кнопки добавления</aspect>
+      <clients>btn-success (зеленый)</clients>
+      <users>btn-primary (синий)</users>
+    </difference>
+    <difference>
+      <aspect>Структура таблицы</aspect>
+      <clients>7 колонок (включая ИНН, Адрес, Статус)</clients>
+      <users>6 колонок (ФИО, Email, Телефон, Роль, Дата, Действия)</users>
+    </difference>
+    <difference>
+      <aspect>Обработка пустых значений</aspect>
+      <clients>ИНН и Адрес имеют условное отображение</clients>
+      <users>Все поля обязательные (кроме отчества)</users>
+    </difference>
+  </comparison>
+  
+  <actions>
+    <action type="create" href="/Clients/Create" class="btn btn-success">
+      <icon>fas fa-user-plus</icon>
+      <label>Добавить клиента</label>
+    </action>
+    <action type="edit" href="/Clients/Edit/{id}" class="btn btn-sm btn-warning">
+      <icon>fas fa-edit</icon>
+      <label>Редактировать</label>
+    </action>
+    <action type="delete" href="/Clients/Delete/{id}" class="btn btn-sm btn-danger">
+      <icon>fas fa-trash</icon>
+      <label>Удалить</label>
+    </action>
+  </actions>
+</view>

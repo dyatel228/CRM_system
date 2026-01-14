@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Index" path="Views/Deals/Index.cshtml" controller="DealsController" action="Index">
+  <summary>Представление для отображения списка всех сделок с финансовой информацией, стадиями и сроками выполнения</summary>
+  
+  <model type="IEnumerable&lt;CRM.Web.Models.Deal&gt;">
+    <summary>Коллекция объектов Deal для отображения в таблице сделок</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Сделки">
+      <summary>Заголовок страницы со списком сделок</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <header type="div" class="d-flex justify-content-between align-items-center mb-4">
+        <element type="h1" class="form-title">
+          <icon>fas fa-handshake</icon>
+          <content>Сделки</content>
+        </element>
+        <action type="a" href="/Deals/Create" class="btn btn-warning">
+          <icon>fas fa-handshake</icon>
+          <content>Добавить сделку</content>
+        </action>
+      </header>
+      
+      <conditional if="!Model.Any()">
+        <element type="div" class="empty-table">
+          <icon>fas fa-handshake-slash</icon>
+          <message>Сделки не найдены</message>
+          <action type="a" href="/Deals/Create" class="btn btn-warning">
+            <icon>fas fa-handshake</icon>
+            <content>Добавить первую сделку</content>
+          </action>
+        </element>
+      </conditional>
+      
+      <conditional if="Model.Any()">
+        <element type="div" class="table-responsive">
+          <table class="table">
+            <columns>
+              <column name="Сделка" width="auto">
+                <header>Сделка</header>
+                <content>
+                  <strong>@item.DealName</strong>
+                  <div class="text-muted small">Клиент ID: @item.ClientId</div>
+                </content>
+              </column>
+              <column name="Сумма" width="auto">
+                <header>Сумма</header>
+                <content>
+                  <amount type="span" class="badge bg-success">
+                    <value>@item.Amount.ToString("N2") ₽</value>
+                    <format>N2 (два десятичных знака)</format>
+                    <currency>₽ (российский рубль)</currency>
+                  </amount>
+                </content>
+              </column>
+              <column name="Стадия" width="auto">
+                <header>Стадия</header>
+                <content>
+                  <switch expression="item.Stage">
+                    <case value="Переговоры">
+                      <badge class="bg-primary">@item.Stage</badge>
+                      <colorMeaning>Начальная стадия, обсуждение условий</colorMeaning>
+                    </case>
+                    <case value="Оформление">
+                      <badge class="bg-warning">@item.Stage</badge>
+                      <colorMeaning>Подготовка документов, формальное оформление</colorMeaning>
+                    </case>
+                    <case value="Закрыта">
+                      <badge class="bg-success">@item.Stage</badge>
+                      <colorMeaning>Успешно завершенная сделка</colorMeaning>
+                    </case>
+                    <case value="Отменена">
+                      <badge class="bg-danger">@item.Stage</badge>
+                      <colorMeaning>Отмененная или сорванная сделка</colorMeaning>
+                    </case>
+                    <default>
+                      <badge class="bg-secondary">@item.Stage</badge>
+                      <colorMeaning>Неизвестная или неопределенная стадия</colorMeaning>
+                    </default>
+                  </switch>
+                </content>
+              </column>
+              <column name="Срок" width="auto">
+                <header>Срок</header>
+                <content>
+                  <conditional if="item.DeadlineDate.HasValue">
+                    <then>
+                      <deadline type="span" class="@(item.DeadlineDate &lt; DateTime.Now ? &quot;text-danger&quot; : &quot;text-success&quot;)">
+                        <value>@item.DeadlineDate.Value.ToString("dd.MM.yyyy")</value>
+                        <format>dd.MM.yyyy</format>
+                        <status>
+                          <conditional if="item.DeadlineDate &lt; DateTime.Now">
+                            <then>Просрочен</then>
+                            <else>Актуален</else>
+                          </conditional>
+                        </status>
+                      </deadline>
+                    </then>
+                    <else>
+                      <element type="span" class="text-muted">Не указан</element>
+                    </else>
+                  </conditional>
+                </content>
+              </column>
+              <column name="Дата создания" width="auto">
+                <header>Дата создания</header>
+                <content>
+                  <element type="span" class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</element>
+                  <format>dd.MM.yyyy</format>
+                </content>
+              </column>
+              <column name="Действия" width="auto" class="text-center">
+                <header>Действия</header>
+                <content>
+                  <actions type="div" class="table-actions">
+                    <action type="a" href="/Deals/Edit/@item.Id" class="btn btn-sm btn-warning">
+                      <icon>fas fa-edit</icon>
+                      <tooltip>Редактировать сделку</tooltip>
+                    </action>
+                    <action type="a" href="/Deals/Delete/@item.Id" class="btn btn-sm btn-danger">
+                      <icon>fas fa-trash</icon>
+                      <tooltip>Удалить сделку</tooltip>
+                    </action>
+                  </actions>
+                </content>
+              </column>
+            </columns>
+            
+            <rows>
+              <foreach collection="Model" item="item">
+                <row>
+                  <!-- Данные заполняются согласно колонкам выше -->
+                </row>
+              </foreach>
+            </rows>
+          </table>
+        </element>
+      </conditional>
+    </container>
+  </structure>
+  
+  <features>
+    <feature name="Цветовая индикация стадий">
+      <summary>Стадии сделок выделены цветом для быстрой визуальной идентификации</summary>
+      <stage color="bg-primary" meaning="Переговоры">Синий - обсуждение условий</stage>
+      <stage color="bg-warning" meaning="Оформление">Желтый - подготовка документов</stage>
+      <stage color="bg-success" meaning="Закрыта">Зеленый - успешно завершена</stage>
+      <stage color="bg-danger" meaning="Отменена">Красный - отмененная сделка</stage>
+      <stage color="bg-secondary" meaning="default">Серый - неизвестная стадия</stage>
+    </feature>
+    <feature name="Динамическое окрашивание сроков">
+      <summary>Просроченные сроки подсвечиваются красным, актуальные - зеленым</summary>
+      <logic>item.DeadlineDate &lt; DateTime.Now ? "text-danger" : "text-success"</logic>
+    </feature>
+    <feature name="Форматирование денежных сумм">
+      <summary>Суммы сделок отображаются с двумя десятичными знаками и валютой</summary>
+      <format>ToString("N2") ₽</format>
+      <example>150,000.50 ₽</example>
+    </feature>
+    <feature name="Условное отображение сроков">
+      <summary>Отсутствующие сроки отображаются как "Не указан"</summary>
+      <condition>item.DeadlineDate.HasValue</condition>
+    </feature>
+  </features>
+  
+  <dataModelExtensions>
+    <field name="DealName" alias="Title">
+      <type>string</type>
+      <note>В модели ранее было поле Title, в представлении используется DealName</note>
+      <consistencyCheck>Требуется проверка соответствия поля в модели</consistencyCheck>
+    </field>
+    <field name="ClientId">
+      <type>long</type>
+      <display>Отображается как "Клиент ID: @item.ClientId"</display>
+      <note>Без названия компании, только идентификатор</note>
+    </field>
+    <field name="Amount">
+      <type>decimal</type>
+      <format display="N2">Два десятичных знака</format>
+      <currency>₽</currency>
+    </field>
+    <field name="Stage">
+      <type>string</type>
+      <allowedValues>
+        <value>Переговоры</value>
+        <value>Оформление</value>
+        <value>Закрыта</value>
+        <value>Отменена</value>
+      </allowedValues>
+    </field>
+    <field name="DeadlineDate">
+      <type>DateTime?</type>
+      <nullable>true</nullable>
+      <format display="dd.MM.yyyy">Дата без времени</format>
+    </field>
+    <field name="CreatedDate">
+      <format display="dd.MM.yyyy">Только дата без времени</format>
+    </field>
+  </dataModelExtensions>
+  
+  <comparison with="clients_index.xml">
+    <difference>
+      <aspect>Цветовая тема</aspect>
+      <deals>Желтая (btn-warning, fa-handshake)</deals>
+      <clients>Зеленая (btn-success, fa-building)</clients>
+    </difference>
+    <difference>
+      <aspect>Финансовая информация</aspect>
+      <deals>Сумма сделки с валютой (₽)</deals>
+      <clients>ИНН компании</clients>
+    </difference>
+    <difference>
+      <aspect>Временные показатели</aspect>
+      <deals>Срок выполнения (DeadlineDate) с проверкой просрочки</deals>
+      <clients>Только дата создания</clients>
+    </difference>
+    <difference>
+      <aspect>Статусы/Стадии</aspect>
+      <deals>Стадии сделки (бизнес-процесс)</deals>
+      <clients>Статусы клиента (отношения)</clients>
+    </difference>
+  </comparison>
+  
+  <businessLogic>
+    <rule name="Проверка просрочки">
+      <description>Сроки сделок проверяются на просрочку относительно текущей даты</description>
+      <condition>item.DeadlineDate &lt; DateTime.Now</condition>
+      <visualIndicator>text-danger (красный цвет)</visualIndicator>
+    </rule>
+    <rule name="Форматирование валюты">
+      <description>Суммы сделок форматируются с двумя знаками после запятой и символом рубля</description>
+      <format>ToString("N2") ₽</format>
+    </rule>
+    <rule name="Иерархия стадий">
+      <description>Стадии сделки отражают прогресс в бизнес-процессе</description>
+      <stages>Переговоры → Оформление → [Закрыта|Отменена]</stages>
+    </rule>
+  </businessLogic>
+  
+  <actions>
+    <action type="create" href="/Deals/Create" class="btn btn-warning">
+      <icon>fas fa-handshake</icon>
+      <label>Добавить сделку</label>
+    </action>
+    <action type="edit" href="/Deals/Edit/{id}" class="btn btn-sm btn-warning">
+      <icon>fas fa-edit</icon>
+      <label>Редактировать</label>
+    </action>
+    <action type="delete" href="/Deals/Delete/{id}" class="btn btn-sm btn-danger">
+      <icon>fas fa-trash</icon>
+      <label>Удалить</label>
+    </action>
+  </actions>
+</view>

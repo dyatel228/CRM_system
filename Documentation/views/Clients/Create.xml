@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Create" path="Views/Clients/Create.cshtml" controller="ClientsController" action="Create">
+  <summary>Форма создания нового клиента (компании) с полями для основной контактной информации и статуса</summary>
+  
+  <model type="CRM.Web.Models.Client">
+    <summary>Модель клиента для создания новой записи</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Добавление клиента">
+      <summary>Заголовок страницы создания клиента</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <form method="post" action="/Clients/Create">
+    <!-- Основное поле -->
+    <fieldGroup name="company" layout="single">
+      <field name="CompanyName" type="text" required="true">
+        <label>Название компании</label>
+        <placeholder>Введите название компании</placeholder>
+        <validation>
+          <required>true</required>
+        </validation>
+        <note>Единственное обязательное поле в форме</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Группа полей: ИНН и телефон -->
+    <fieldGroup name="identifiers" layout="row" columns="2">
+      <field name="INN" type="text" required="false">
+        <label>ИНН</label>
+        <placeholder>10 или 12 цифр</placeholder>
+        <formatHint>10 цифр для юридических лиц, 12 для ИП</formatHint>
+        <columnSize>col-md-6</columnSize>
+        <validation>
+          <pattern>\d{10}|\d{12}</pattern>
+          <note>Необязательное поле, но должно соответствовать формату ИНН</note>
+        </validation>
+      </field>
+      
+      <field name="Phone" type="tel" required="false">
+        <label>Телефон</label>
+        <placeholder>+7 (XXX) XXX-XX-XX</placeholder>
+        <columnSize>col-md-6</columnSize>
+        <note>Необязательное поле</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Email -->
+    <fieldGroup name="email" layout="single">
+      <field name="Email" type="email" required="false">
+        <label>Email</label>
+        <placeholder>example@email.com</placeholder>
+        <validation>
+          <type>email</type>
+        </validation>
+        <note>Необязательное поле, но должно быть валидным email при заполнении</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Адрес -->
+    <fieldGroup name="address" layout="single">
+      <field name="Address" type="textarea" required="false">
+        <label>Адрес</label>
+        <placeholder>Полный адрес компании</placeholder>
+        <rows>3</rows>
+        <note>Многострочное поле для полного адреса компании</note>
+      </field>
+    </fieldGroup>
+    
+    <!-- Поле Статус -->
+    <fieldGroup name="status" layout="single">
+      <field name="Status" type="select" required="false">
+        <label>Статус</label>
+        <options>
+          <option value="Лид" default="true">
+            <label>Лид</label>
+            <description>Первичный контакт, потенциальный клиент</description>
+          </option>
+          <option value="Активный">
+            <label>Активный</label>
+            <description>Работающий клиент</description>
+          </option>
+          <option value="Неактивный">
+            <label>Неактивный</label>
+            <description>Неактивный клиент</description>
+          </option>
+          <option value="Отказ">
+            <label>Отказ</label>
+            <description>Отказался от сотрудничества</description>
+          </option>
+        </options>
+        <note>По умолчанию выбирается "Лид"</note>
+      </field>
+    </fieldGroup>
+    
+    <actions>
+      <action type="submit" class="btn btn-success">
+        <icon>fas fa-save</icon>
+        <label>Создать клиента</label>
+      </action>
+      <action type="cancel" href="/Clients" class="btn btn-outline-secondary">
+        <icon>fas fa-arrow-left</icon>
+        <label>Назад к списку</label>
+      </action>
+    </actions>
+  </form>
+  
+  <features>
+    <feature name="Минимальные требования">
+      <summary>Только поле "Название компании" является обязательным, все остальные - опциональные</summary>
+    </feature>
+    <feature name="Валидация форматов">
+      <summary>Используются HTML5 типы полей (email, tel) и подсказки для формата ИНН</summary>
+    </feature>
+    <feature name="Адаптивная сетка">
+      <summary>Используется Bootstrap grid (row, col-md-6) для полей ИНН и Телефон</summary>
+    </feature>
+    <feature name="Многострочный адрес">
+      <summary>Поле адреса реализовано как textarea с 3 строками для удобства ввода</summary>
+    </feature>
+    <feature name="Иерархия статусов">
+      <summary>Выпадающий список статусов отражает жизненный цикл клиента</summary>
+    </feature>
+  </features>
+  
+  <businessRules>
+    <rule field="CompanyName">
+      <required>true</required>
+    </rule>
+    <rule field="INN">
+      <required>false</required>
+      <pattern>\d{10}|\d{12}</pattern>
+      <validationMessage>ИНН должен содержать 10 или 12 цифр</validationMessage>
+    </rule>
+    <rule field="Status">
+      <defaultValue>Лид</defaultValue>
+      <allowedValues>
+        <value>Лид</value>
+        <value>Активный</value>
+        <value>Неактивный</value>
+        <value>Отказ</value>
+      </allowedValues>
+    </rule>
+  </businessRules>
+  
+  <comparison with="users_create.xml">
+    <difference>
+      <aspect>Обязательные поля</aspect>
+      <clients>Только CompanyName</clients>
+      <users>LastName, FirstName, Email</users>
+    </difference>
+    <difference>
+      <aspect>Типы полей</aspect>
+      <clients>ИНН (специальный формат), Адрес (textarea), Статус (select)</clients>
+      <users>ФИО (текст), Роль (select)</users>
+    </difference>
+    <difference>
+      <aspect>Цветовая схема</aspect>
+      <clients>Зеленая тема (btn-success, fa-user-tie)</clients>
+      <users>Синяя тема (btn-primary, fa-user-plus)</users>
+    </difference>
+    <difference>
+      <aspect>Сложность валидации</aspect>
+      <clients>Простая (только required для CompanyName)</clients>
+      <users>Сложная (валидация Email с подсветкой ошибок)</users>
+    </difference>
+  </comparison>
+  
+  <dataModelInsights>
+    <insight>
+      <field>INN</field>
+      <type>string</type>
+      <maxLength>12</maxLength>
+      <note>Хранится как строка, но должен соответствовать цифровому формату</note>
+    </insight>
+    <insight>
+      <field>Status</field>
+      <type>string</type>
+      <defaultValue>Лид</defaultValue>
+      <businessMeaning>Определяет этап взаимоотношений с клиентом</businessMeaning>
+    </insight>
+    <insight>
+      <field>Address</field>
+      <type>string</type>
+      <uiControl>textarea</uiControl>
+      <note>Многострочный адрес, может содержать произвольный текст</note>
+    </insight>
+  </dataModelInsights>
+</view>

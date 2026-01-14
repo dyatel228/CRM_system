@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view name="Delete" path="Views/Clients/Delete.cshtml" controller="ClientsController" action="Delete">
+  <summary>Страница подтверждения удаления клиента с детальным отображением информации о компании и предупреждением о необратимости действия</summary>
+  
+  <model type="CRM.Web.Models.Client">
+    <summary>Модель клиента для отображения полной информации перед удалением</summary>
+  </model>
+  
+  <viewData>
+    <data key="Title" value="Удаление клиента">
+      <summary>Заголовок страницы подтверждения удаления</summary>
+    </data>
+  </viewData>
+  
+  <layout>
+    <file>_Layout.cshtml</file>
+    <path>Views/Shared/_Layout.cshtml</path>
+  </layout>
+  
+  <structure>
+    <container type="div" class="container">
+      <container type="div" class="form-container">
+        <header type="h1" class="form-title">
+          <icon>fas fa-user-times</icon>
+          <content>Удаление клиента</content>
+        </header>
+        
+        <!-- Блок предупреждения -->
+        <warning type="div" class="alert alert-danger">
+          <heading type="h4">Вы уверены, что хотите удалить этого клиента?</heading>
+          <message type="p">Это действие нельзя отменить.</message>
+          <importance>high</importance>
+          <irreversible>true</irreversible>
+        </warning>
+        
+        <!-- Информация о клиенте -->
+        <infoSection type="div" class="client-info">
+          <heading type="h4">Информация о клиенте:</heading>
+          <fields>
+            <field name="Компания">
+              <value>@Model.CompanyName</value>
+              <importance>high</importance>
+            </field>
+            <field name="ИНН">
+              <value>
+                <conditional if="string.IsNullOrEmpty(Model.INN)">
+                  <then>Не указан</then>
+                  <else>@Model.INN</else>
+                </conditional>
+              </value>
+              <logic>Проверка на пустое значение</logic>
+            </field>
+            <field name="Email">
+              <value>@Model.Email</value>
+            </field>
+            <field name="Телефон">
+              <value>@Model.Phone</value>
+            </field>
+            <field name="Адрес">
+              <value>
+                <conditional if="string.IsNullOrEmpty(Model.Address)">
+                  <then>Не указан</then>
+                  <else>@Model.Address</else>
+                </conditional>
+              </value>
+              <logic>Проверка на пустое значение</logic>
+            </field>
+            <field name="Статус">
+              <value>
+                <badge class="bg-primary">@Model.Status</badge>
+              </value>
+              <visual>color-coded-badge</visual>
+            </field>
+            <field name="Дата создания">
+              <value>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</value>
+              <format>dd.MM.yyyy HH:mm</format>
+              <note>Полный формат даты и времени создания</note>
+            </field>
+          </fields>
+          <purpose>
+            <summary>Отображение полной информации о клиенте для принятия осознанного решения об удалении</summary>
+          </purpose>
+        </infoSection>
+        
+        <!-- Форма действий -->
+        <actions type="div" class="form-actions">
+          <!-- Форма удаления -->
+          <form method="post" action="/Clients/Delete/@Model.Id" style="display: inline;">
+            <hiddenFields>
+              <field name="Id" value="@Model.Id">
+                <summary>ID клиента передается в POST-запросе</summary>
+              </field>
+            </hiddenFields>
+            <action type="submit" class="btn btn-danger">
+              <icon>fas fa-trash</icon>
+              <label>Удалить</label>
+              <confirmation>implicit</confirmation>
+              <irreversible>true</irreversible>
+            </action>
+          </form>
+          
+          <!-- Кнопка отмены -->
+          <action type="cancel" href="/Clients" class="btn btn-outline-secondary">
+            <icon>fas fa-times</icon>
+            <label>Отмена</label>
+            <safe>true</safe>
+          </action>
+        </actions>
+      </container>
+    </container>
+  </structure>
+  
+  <userInterface>
+    <elements>
+      <element name="Заголовок с иконкой">
+        <icon>fas fa-user-times</icon>
+        <purpose>Визуальное обозначение операции удаления</purpose>
+      </element>
+      <element name="Предупреждающий блок">
+        <type>alert alert-danger</type>
+        <purpose>Привлечение внимания к серьезности и необратимости действия</purpose>
+      </element>
+      <element name="Информационная панель клиента">
+        <type>client-info</type>
+        <fieldsCount>7</fieldsCount>
+        <purpose>Комплексное отображение всех данных клиента для подтверждения</purpose>
+      </element>
+      <element name="Условное форматирование">
+        <appliedTo>ИНН, Адрес</appliedTo>
+        <logic>string.IsNullOrEmpty() ? "Не указан" : значение</logic>
+      </element>
+      <element name="Кнопка удаления">
+        <color>danger (красный)</color>
+        <icon>fas fa-trash</icon>
+        <purpose>Явное указание на деструктивное действие</purpose>
+      </element>
+      <element name="Кнопка отмены">
+        <color>outline-secondary (серый)</color>
+        <icon>fas fa-times</icon>
+        <purpose>Безопасная альтернатива отмены операции</purpose>
+      </element>
+    </elements>
+  </userInterface>
+  
+  <businessLogic>
+    <rule name="Подтверждение с полной информацией">
+      <description>Пользователь должен видеть все данные клиента перед удалением</description>
+      <fields>Компания, ИНН, Email, Телефон, Адрес, Статус, Дата создания</fields>
+    </rule>
+    <rule name="Обработка пустых значений">
+      <description>Пустые поля ИНН и Адрес отображаются как "Не указан"</description>
+      <method>string.IsNullOrEmpty()</method>
+      <appliedTo>INN, Address</appliedTo>
+    </rule>
+    <rule name="Форматирование даты">
+      <description>Дата создания отображается в полном формате с временем</description>
+      <format>dd.MM.yyyy HH:mm</format>
+      <note>Более подробно, чем в списке клиентов (там только дата)</note>
+    </rule>
+    <rule name="Необратимость действия">
+      <description>Явное предупреждение о невозможности отмены удаления</description>
+    </rule>
+  </businessLogic>
+  
+  <comparison with="users_delete.xml">
+    <difference>
+      <aspect>Информационные поля</aspect>
+      <clients>Компания, ИНН, Адрес, Статус</clients>
+      <users>ФИО, Email, Телефон, Роль</users>
+    </difference>
+    <difference>
+      <aspect>Обработка пустых значений</aspect>
+      <clients>Для ИНН и Адреса используется "Не указан"</clients>
+      <users>Все поля обязательные (кроме отчества)</users>
+    </difference>
+    <difference>
+      <aspect>Формат даты</aspect>
+      <clients>dd.MM.yyyy HH:mm (с временем)</clients>
+      <users>dd.MM.yyyy HH:mm (одинаковый формат)</users>
+    </difference>
+    <difference>
+      <aspect>Цвет бейджа статуса</aspect>
+      <clients>bg-primary (синий) независимо от статуса</clients>
+      <users>Разные цвета в зависимости от роли</users>
+    </difference>
+  </comparison>
+  
+  <comparison with="clients_edit.xml">
+    <difference>
+      <aspect>Назначение страницы</aspect>
+      <delete>Подтверждение удаления (деструктивное)</delete>
+      <edit>Редактирование данных (конструктивное)</delete>
+    </difference>
+    <difference>
+      <aspect>Элементы управления</aspect>
+      <delete>Только кнопки Удалить/Отмена</delete>
+      <edit>Полная форма с полями ввода</delete>
+    </difference>
+    <difference>
+      <aspect>Отображение данных</aspect>
+      <delete>Только для чтения, с проверкой пустых значений</delete>
+      <edit>Редактируемые поля без дополнительного форматирования</delete>
+    </difference>
+  </comparison>
+  
+  <security>
+    <consideration>
+      <type>confirmation-with-data</type>
+      <description>Требует подтверждения с отображением полных данных удаляемого объекта</description>
+    </consideration>
+    <consideration>
+      <type>id-verification</type>
+      <description>Явное отображение данных по ID для предотвращения случайного удаления</description>
+    </consideration>
+  </security>
+</view>
