@@ -1,0 +1,64 @@
+﻿@model CRM.Web.Models.Client
+@{
+    ViewData["Title"] = "Добавление клиента";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-tie"></i> @ViewData["Title"]
+        </h1>
+
+        <form method="post" action="/Clients/Create">
+            <div class="form-group">
+                <label class="form-label required">Название компании</label>
+                <input type="text" class="form-control" name="CompanyName" required placeholder="Введите название компании">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">ИНН</label>
+                        <input type="text" class="form-control" name="INN" placeholder="10 или 12 цифр">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" name="Phone" placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="Email" placeholder="example@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Адрес</label>
+                <textarea class="form-control" name="Address" rows="3" placeholder="Полный адрес компании"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Статус</label>
+                <select class="form-select" name="Status">
+                    <option value="Лид">Лид</option>
+                    <option value="Активный">Активный</option>
+                    <option value="Неактивный">Неактивный</option>
+                    <option value="Отказ">Отказ</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Создать клиента
+                </button>
+                <a href="/Clients" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

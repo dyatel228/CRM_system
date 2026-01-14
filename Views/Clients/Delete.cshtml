@@ -1,0 +1,40 @@
+﻿@model CRM.Web.Models.Client
+@{
+    ViewData["Title"] = "Удаление клиента";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-times"></i> @ViewData["Title"]
+        </h1>
+
+        <div class="alert alert-danger">
+            <h4>Вы уверены, что хотите удалить этого клиента?</h4>
+            <p>Это действие нельзя отменить.</p>
+        </div>
+
+        <div class="client-info">
+            <h4>Информация о клиенте:</h4>
+            <p><strong>Компания:</strong> @Model.CompanyName</p>
+            <p><strong>ИНН:</strong> @(string.IsNullOrEmpty(Model.INN) ? "Не указан" : Model.INN)</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Телефон:</strong> @Model.Phone</p>
+            <p><strong>Адрес:</strong> @(string.IsNullOrEmpty(Model.Address) ? "Не указан" : Model.Address)</p>
+            <p><strong>Статус:</strong> <span class="badge bg-primary">@Model.Status</span></p>
+            <p><strong>Дата создания:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+
+        <div class="form-actions">
+            <form method="post" action="/Clients/Delete/@Model.Id" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </form>
+            <a href="/Clients" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </div>
+</div>

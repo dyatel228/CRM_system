@@ -1,0 +1,95 @@
+﻿@model CRM.Web.Models.User
+@{
+    ViewData["Title"] = "Добавление пользователя";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-plus"></i> @ViewData["Title"]
+        </h1>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <form method="post" action="/Users/Create">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label required">Фамилия</label>
+                        <input type="text" class="form-control" name="LastName" required
+                               placeholder="Введите фамилию" maxlength="100"
+                               value="@(Model?.LastName ?? "")">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label required">Имя</label>
+                        <input type="text" class="form-control" name="FirstName" required
+                               placeholder="Введите имя" maxlength="100"
+                               value="@(Model?.FirstName ?? "")">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Отчество</label>
+                        <input type="text" class="form-control" name="Patronymic"
+                               placeholder="Введите отчество" maxlength="100"
+                               value="@(Model?.Patronymic ?? "")">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Email</label>
+                        <input type="email" class="form-control @(ViewData.ModelState["Email"]?.Errors?.Any() == true ? "is-invalid" : "")"
+                               name="Email" required placeholder="example@email.com"
+                               maxlength="255" value="@(Model?.Email ?? "")">
+                        @if (ViewData.ModelState["Email"]?.Errors?.Any() == true)
+                        {
+                            <div class="invalid-feedback">
+                                @ViewData.ModelState["Email"].Errors.First().ErrorMessage
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" name="Phone"
+                               placeholder="+7 (XXX) XXX-XX-XX" maxlength="20"
+                               value="@(Model?.Phone ?? "")">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Роль</label>
+                <select class="form-select" name="Role">
+                    <option value="менеджер" selected="@(Model?.Role == "менеджер" || Model == null)">Менеджер</option>
+                    <option value="Администратор" selected="@(Model?.Role == "Администратор")">Администратор</option>
+                    <option value="Аналитик" selected="@(Model?.Role == "Аналитик")">Аналитик</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Создать
+                </button>
+                <a href="/Users" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
