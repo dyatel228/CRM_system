@@ -1,0 +1,92 @@
+﻿@model CRM.Web.Models.User
+@{
+    ViewData["Title"] = "Редактирование пользователя";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-edit"></i> @ViewData["Title"]
+        </h1>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <form method="post" action="/Users/Edit/@Model.Id">
+            <input type="hidden" name="Id" value="@Model.Id">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label required">Фамилия</label>
+                        <input type="text" class="form-control" name="LastName"
+                               value="@Model.LastName" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label required">Имя</label>
+                        <input type="text" class="form-control" name="FirstName"
+                               value="@Model.FirstName" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Отчество</label>
+                        <input type="text" class="form-control" name="Patronymic"
+                               value="@Model.Patronymic">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Email</label>
+                        <input type="email" class="form-control @(ViewData.ModelState["Email"]?.Errors?.Any() == true ? "is-invalid" : "")"
+                               name="Email" value="@Model.Email" required>
+                        @if (ViewData.ModelState["Email"]?.Errors?.Any() == true)
+                        {
+                            <div class="invalid-feedback">
+                                @ViewData.ModelState["Email"].Errors.First().ErrorMessage
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" name="Phone"
+                               value="@Model.Phone">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Роль</label>
+                <select class="form-select" name="Role">
+                    <option value="менеджер" selected="@(Model.Role == "менеджер")">Менеджер</option>
+                    <option value="Администратор" selected="@(Model.Role == "Администратор")">Администратор</option>
+                    <option value="Аналитик" selected="@(Model.Role == "Аналитик")">Аналитик</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <a href="/Users" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

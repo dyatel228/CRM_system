@@ -1,0 +1,105 @@
+﻿@model IEnumerable<CRM.Web.Models.Client>
+@{
+    ViewData["Title"] = "Клиенты";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="form-title">
+            <i class="fas fa-building"></i> @ViewData["Title"]
+        </h1>
+        <a href="/Clients/Create" class="btn btn-success">
+            <i class="fas fa-user-plus"></i> Добавить клиента
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-table">
+            <i class="fas fa-users-slash"></i>
+            <p>Клиенты не найдены</p>
+            <a href="/Clients/Create" class="btn btn-success">
+                <i class="fas fa-user-plus"></i> Добавить первого клиента
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Компания</th>
+                        <th>ИНН</th>
+                        <th>Контакты</th>
+                        <th>Адрес</th>
+                        <th>Статус</th>
+                        <th>Дата создания</th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.CompanyName</strong>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.INN))
+                                {
+                                    <span class="badge bg-info">@item.INN</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Не указан</span>
+                                }
+                            </td>
+                            <td>
+                                <div><i class="fas fa-envelope"></i> @item.Email</div>
+                                <div><i class="fas fa-phone"></i> @item.Phone</div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Address))
+                                {
+                                    <span class="small">@item.Address</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Не указан</span>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var statusClass = item.Status switch
+                                    {
+                                        "Лид" => "bg-primary",
+                                        "Активный" => "bg-success",
+                                        "Неактивный" => "bg-secondary",
+                                        "Отказ" => "bg-danger",
+                                        _ => "bg-warning"
+                                    };
+                                }
+                                <span class="badge @statusClass">@item.Status</span>
+                            </td>
+                            <td>
+                                <span class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="/Clients/Edit/@item.Id" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/Clients/Delete/@item.Id" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

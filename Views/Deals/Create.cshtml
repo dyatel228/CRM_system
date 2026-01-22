@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Добавление сделки";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-handshake"></i> @ViewData["Title"]
+        </h1>
+
+        <form method="post" action="/Deals/Create">
+            <div class="form-group">
+                <label class="form-label required">Название сделки</label>
+                <input type="text" class="form-control" name="DealName" required placeholder="Введите название сделки">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Клиент</label>
+                        <select class="form-select" name="ClientId" required>
+                            <option value="">Выберите клиента</option>
+                            @if (ViewBag.Clients != null)
+                            {
+                                foreach (var client in ViewBag.Clients)
+                                {
+                                    <option value="@client.Id">@client.CompanyName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Ответственный менеджер</label>
+                        <select class="form-select" name="ResponsibleUserId">
+                            <option value="">Не назначен</option>
+                            @if (ViewBag.Users != null)
+                            {
+                                foreach (var user in ViewBag.Users)
+                                {
+                                    <option value="@user.Id">@user.LastName @user.FirstName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Сумма (₽)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" name="Amount" required placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Стадия</label>
+                        <select class="form-select" name="Stage">
+                            <option value="Переговоры">Переговоры</option>
+                            <option value="Оформление">Оформление</option>
+                            <option value="Закрыта">Закрыта</option>
+                            <option value="Отменена">Отменена</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Срок исполнения</label>
+                <input type="date" class="form-control" name="DeadlineDate">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Создать сделку
+                </button>
+                <a href="/Deals" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

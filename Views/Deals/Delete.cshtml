@@ -1,0 +1,42 @@
+﻿@model CRM.Web.Models.Deal
+@{
+    ViewData["Title"] = "Удаление сделки";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-handshake"></i> @ViewData["Title"]
+        </h1>
+
+        <div class="alert alert-danger">
+            <h4>Вы уверены, что хотите удалить эту сделку?</h4>
+            <p>Это действие нельзя отменить.</p>
+        </div>
+
+        <div class="deal-info">
+            <h4>Информация о сделке:</h4>
+            <p><strong>Название:</strong> @Model.DealName</p>
+            <p><strong>Клиент ID:</strong> @Model.ClientId</p>
+            <p><strong>Сумма:</strong> <span class="badge bg-success">@Model.Amount.ToString("N2") ₽</span></p>
+            <p><strong>Стадия:</strong> <span class="badge bg-primary">@Model.Stage</span></p>
+            @if (Model.DeadlineDate.HasValue)
+            {
+                <p><strong>Срок исполнения:</strong> @Model.DeadlineDate.Value.ToString("dd.MM.yyyy")</p>
+            }
+            <p><strong>Дата создания:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+
+        <div class="form-actions">
+            <form method="post" action="/Deals/Delete/@Model.Id" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </form>
+            <a href="/Deals" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </div>
+</div>

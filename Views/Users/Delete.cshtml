@@ -1,0 +1,38 @@
+﻿@model CRM.Web.Models.User
+@{
+    ViewData["Title"] = "Удаление пользователя";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-times"></i> @ViewData["Title"]
+        </h1>
+
+        <div class="alert alert-danger">
+            <h4>Вы уверены, что хотите удалить этого пользователя?</h4>
+            <p>Это действие нельзя отменить.</p>
+        </div>
+
+        <div class="user-info">
+            <h4>Информация о пользователе:</h4>
+            <p><strong>ФИО:</strong> @Model.GetFullName()</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Телефон:</strong> @Model.Phone</p>
+            <p><strong>Роль:</strong> <span class="badge bg-primary">@Model.Role</span></p>
+            <p><strong>Дата создания:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+
+        <div class="form-actions">
+            <form method="post" action="/Users/Delete/@Model.Id" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </form>
+            <a href="/Users" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </div>
+</div>

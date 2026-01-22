@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+    Layout = "_Layout";
+}
+
+<!-- Добавление данных -->
+<h3 class="mt-5 mb-3">Добавление данных</h3>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <a href="/Users/Create" class="btn btn-primary btn-block">
+            <i class="fas fa-user-plus"></i> Добавить сотрудника
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="/Clients/Create" class="btn btn-success btn-block">
+            <i class="fas fa-user-tie"></i> Добавить клиента
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="/Deals/Create" class="btn btn-warning btn-block">
+            <i class="fas fa-handshake"></i> Добавить сделку
+        </a>
+    </div>
+</div>
+
+<!-- Навигация -->
+<h3 class="mt-5 mb-3">Навигация</h3>
+<div class="row">
+    <div class="col-md-4 text-center mb-3">
+        <a href="/Users" class="btn btn-outline-primary">
+            <i class="fas fa-users fa-2x mb-2"></i><br>
+            Управление пользователями
+        </a>
+    </div>
+    <div class="col-md-4 text-center mb-3">
+        <a href="/Clients" class="btn btn-outline-success">
+            <i class="fas fa-building fa-2x mb-2"></i><br>
+            Управление клиентами
+        </a>
+    </div>
+    <div class="col-md-4 text-center mb-3">
+        <a href="/Deals" class="btn btn-outline-warning">
+            <i class="fas fa-handshake fa-2x mb-2"></i><br>
+            Управление сделками
+        </a>
+    </div>
+</div>

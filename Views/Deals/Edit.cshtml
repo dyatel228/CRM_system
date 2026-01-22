@@ -1,0 +1,257 @@
+﻿@model CRM.Web.Models.Deal
+@{
+    ViewData["Title"] = "Редактирование сделки";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-handshake"></i> @ViewData["Title"]
+        </h1>
+
+        <!-- Красивые сообщения об ошибках на русском -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle"></i> Пожалуйста, исправьте ошибки:</h5>
+                <ul>
+                    @if (ViewData.ModelState["DealName"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Название сделки:</strong> @ViewData.ModelState["DealName"].Errors.First().ErrorMessage</li>
+                    }
+                    @if (ViewData.ModelState["ClientId"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Клиент:</strong> @ViewData.ModelState["ClientId"].Errors.First().ErrorMessage</li>
+                    }
+                    @if (ViewData.ModelState["Amount"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Сумма:</strong> @ViewData.ModelState["Amount"].Errors.First().ErrorMessage</li>
+                    }
+                    @if (ViewData.ModelState["ResponsibleUserId"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Менеджер:</strong> @ViewData.ModelState["ResponsibleUserId"].Errors.First().ErrorMessage</li>
+                    }
+                    <!-- Добавляем обработку стандартных ошибок -->
+                    @foreach (var key in ViewData.ModelState.Keys)
+                    {
+                        @if (!new[] { "DealName", "ClientId", "Amount", "ResponsibleUserId" }.Contains(key))
+                        {
+                            @foreach (var error in ViewData.ModelState[key].Errors)
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <form method="post" action="/Deals/Edit/@Model.Id">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="Id" value="@Model.Id">
+            <input type="hidden" name="CreatedDate" value="@Model.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+
+            <div class="form-group">
+                <label class="form-label required">Название сделки</label>
+                <input type="text" class="form-control" name="DealName" value="@Model.DealName" required>
+                @if (ViewData.ModelState["DealName"]?.Errors.Any() == true)
+                {
+                    <span class="text-danger small">@ViewData.ModelState["DealName"].Errors.First().ErrorMessage</span>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Клиент</label>
+                        <select class="form-select" name="ClientId" required>
+                            <option value="">Выберите клиента</option>
+                            @if (ViewBag.Clients != null)
+                            {
+                                foreach (var client in ViewBag.Clients)
+                                {
+                                    <option value="@client.Id" selected="@(client.Id == Model.ClientId)">@client.CompanyName</option>
+                                }
+                            }
+                        </select>
+                        @if (ViewData.ModelState["ClientId"]?.Errors.Any() == true)
+                        {
+                            <span class="text-danger small">@ViewData.ModelState["ClientId"].Errors.First().ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Ответственный менеджер</label>
+                        <select class="form-select" name="ResponsibleUserId">
+                            <option value="">Не назначен</option>
+                            @if (ViewBag.Users != null)
+                            {
+                                foreach (var user in ViewBag.Users)
+                                {
+                                    <option value="@user.Id" selected="@(user.Id == Model.ResponsibleUserId)">@user.LastName @user.FirstName</option>
+                                }
+                            }
+                        </select>
+                        @if (ViewData.ModelState["ResponsibleUserId"]?.Errors.Any() == true)
+                        {
+                            <span class="text-danger small">@ViewData.ModelState["ResponsibleUserId"].Errors.First().ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Сумма (₽)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" name="Amount" value="@Model.Amount.ToString("0.00")" required>
+                        @if (ViewData.ModelState["Amount"]?.Errors.Any() == true)
+                        {
+                            <span class="text-danger small">@ViewData.ModelState["Amount"].Errors.First().ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Стадия</label>
+                        <select class="form-select" name="Stage">
+                            <option value="Переговоры" selected="@(Model.Stage == "Переговоры")">Переговоры</option>
+                            <option value="Оформление" selected="@(Model.Stage == "Оформление")">Оформление</option>
+                            <option value="В работе" selected="@(Model.Stage == "В работе")">В работе</option>
+                            <option value="Закрыта" selected="@(Model.Stage == "Закрыта")">Закрыта</option>
+                            <option value="Оплачена" selected="@(Model.Stage == "Оплачена")">Оплачена</option>
+                            <option value="Отменена" selected="@(Model.Stage == "Отменена")">Отменена</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Срок исполнения</label>
+                <input type="date" class="form-control" name="DeadlineDate" value="@(Model.DeadlineDate?.ToString("yyyy-MM-dd") ?? "")">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <a href="/Deals" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .required::after {
+        content: " *";
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+    .text-danger {
+        color: #e74c3c !important;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .alert-danger ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+
+    .alert-danger li {
+        margin-bottom: 5px;
+    }
+
+    .is-invalid {
+        border-color: #e74c3c !important;
+        background-color: rgba(231, 76, 60, 0.05);
+    }
+</style>
+
+<!-- JavaScript для красивой валидации -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const requiredFields = form.querySelectorAll('[required]');
+
+        // Проверка перед отправкой
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            const errorMessages = [];
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    hasErrors = true;
+                    field.classList.add('is-invalid');
+
+                    // Красивые названия полей
+                    const fieldNames = {
+                        'DealName': 'Название сделки',
+                        'ClientId': 'Клиент',
+                        'Amount': 'Сумма'
+                    };
+
+                    const fieldName = fieldNames[field.name] || field.name;
+                    errorMessages.push(`<strong>${fieldName}:</strong> Это поле обязательно для заполнения`);
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            // Проверка суммы (должна быть больше 0)
+            const amountField = form.querySelector('[name="Amount"]');
+            if (amountField && amountField.value.trim()) {
+                const amount = parseFloat(amountField.value);
+                if (amount <= 0) {
+                    hasErrors = true;
+                    amountField.classList.add('is-invalid');
+                    errorMessages.push(`<strong>Сумма:</strong> Введите сумму больше 0`);
+                }
+            }
+
+            if (hasErrors) {
+                e.preventDefault();
+
+                // Удаляем старые алерты
+                const oldAlert = document.querySelector('.alert-danger:not(.alert-dismissible)');
+                if (oldAlert) oldAlert.remove();
+
+                // Создаем красивый алерт
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <h5><i class="fas fa-exclamation-triangle"></i> Пожалуйста, исправьте ошибки:</h5>
+                    <ul class="mb-0">
+                        ${errorMessages.map(msg => `<li>${msg}</li>`).join('')}
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                // Вставляем перед формой
+                const formContainer = document.querySelector('.form-container');
+                formContainer.insertBefore(alertDiv, form);
+
+                // Прокручиваем к первой ошибке
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+
+        // Убираем подсветку при исправлении
+        form.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('required')) {
+                e.target.classList.remove('is-invalid');
+            }
+        });
+    });
+</script>

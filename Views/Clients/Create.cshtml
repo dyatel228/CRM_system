@@ -1,0 +1,164 @@
+﻿@model CRM.Web.Models.Client
+@{
+    ViewData["Title"] = "Добавление клиента";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">
+            <i class="fas fa-user-tie"></i> @ViewData["Title"]
+        </h1>
+
+        <!-- Простые сообщения об ошибках -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle"></i> Пожалуйста, заполните все поля:</h5>
+                <ul>
+                    @if (ViewData.ModelState["CompanyName"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Название компании:</strong> Введите название вашей компании</li>
+                    }
+                    @if (ViewData.ModelState["INN"]?.Errors.Any() == true)
+                    {
+                        <li><strong>ИНН:</strong> Введите правильный ИНН (10 или 12 цифр)</li>
+                    }
+                    @if (ViewData.ModelState["Phone"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Телефон:</strong> Введите номер телефона</li>
+                    }
+                    @if (ViewData.ModelState["Email"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Email:</strong> Введите email адрес</li>
+                    }
+                    @if (ViewData.ModelState["Address"]?.Errors.Any() == true)
+                    {
+                        <li><strong>Адрес:</strong> Введите адрес компании</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form method="post" action="/Clients/Create">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label class="form-label required">Название компании</label>
+                <input type="text" class="form-control" name="CompanyName"
+                       value="@Model?.CompanyName"
+                       placeholder="Введите название компании">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">ИНН</label>
+                        <input type="text" class="form-control" name="INN"
+                               value="@Model?.INN"
+                               placeholder="10 или 12 цифр">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Телефон</label>
+                        <input type="tel" class="form-control" name="Phone"
+                               value="@Model?.Phone"
+                               placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Email</label>
+                        <input type="email" class="form-control" name="Email"
+                               value="@Model?.Email"
+                               placeholder="example@email.com">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label required">Адрес</label>
+                        <textarea class="form-control" name="Address" rows="2">@Model?.Address</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Статус</label>
+                <select class="form-select" name="Status">
+                    <option value="Лид" selected="@(Model?.Status == "Лид")">Лид</option>
+                    <option value="Активный" selected="@(Model?.Status == "Активный")">Активный</option>
+                    <option value="Неактивный" selected="@(Model?.Status == "Неактивный")">Неактивный</option>
+                    <option value="Отказ" selected="@(Model?.Status == "Отказ")">Отказ</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Создать клиента
+                </button>
+                <a href="/Clients" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .required::after {
+        content: " *";
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+    .alert-danger ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+
+    .alert-danger li {
+        margin-bottom: 5px;
+    }
+</style>
+
+<!-- МИНИМАЛЬНЫЙ JavaScript для проверки -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+
+        // Простая проверка перед отправкой
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            const errorMessages = [];
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    hasErrors = true;
+                    field.style.borderColor = '#e74c3c';
+
+                    // Получаем название поля из label
+                    const label = field.closest('.form-group').querySelector('label');
+                    if (label) {
+                        const fieldName = label.textContent.replace('*', '').trim();
+                        errorMessages.push(`Не заполнено поле: ${fieldName}`);
+                    }
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+
+            if (hasErrors) {
+                e.preventDefault();
+
+                // Простое уведомление
+                alert('Пожалуйста, заполните все обязательные поля (отмеченные *)\n\n' +
+                      errorMessages.join('\n'));
+            }
+        });
+    });
+</script>

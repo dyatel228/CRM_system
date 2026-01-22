@@ -1,0 +1,112 @@
+﻿@model IEnumerable<CRM.Web.Models.Deal>
+@{
+    ViewData["Title"] = "Сделки";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="form-title">
+            <i class="fas fa-handshake"></i> @ViewData["Title"]
+        </h1>
+        <a href="/Deals/Create" class="btn btn-warning">
+            <i class="fas fa-handshake"></i> Добавить сделку
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-table">
+            <i class="fas fa-handshake-slash"></i>
+            <p>Сделки не найдены</p>
+            <a href="/Deals/Create" class="btn btn-warning">
+                <i class="fas fa-handshake"></i> Добавить первую сделку
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Сделка</th>
+                        <th>Сумма</th>
+                        <th>Стадия</th>
+                        <th>Менеджер</th> <!-- НОВАЯ КОЛОНКА -->
+                        <th>Срок</th>
+                        <th>Дата создания</th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.DealName</strong>
+                                <div class="text-muted small">Клиент ID: @item.ClientId</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">@item.Amount.ToString("N2") ₽</span>
+                            </td>
+                            <td>
+                                @{
+                                    var stageClass = item.Stage switch
+                                    {
+                                        "Переговоры" => "bg-primary",
+                                        "Оформление" => "bg-warning",
+                                        "В работе" => "bg-info",
+                                        "Закрыта" => "bg-success",
+                                        "Оплачена" => "bg-success",
+                                        "Отменена" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @stageClass">@item.Stage</span>
+                            </td>
+                            <td>
+                                <!-- Просто показываем ID менеджера (пока не исправим логику) -->
+                                @if (item.ResponsibleUserId.HasValue)
+                                {
+                                    <span class="text-muted small">
+                                        Менеджер ID: @item.ResponsibleUserId.Value
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Не назначен</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.DeadlineDate.HasValue)
+                                {
+                                    <span class="@(item.DeadlineDate < DateTime.Now ? "text-danger" : "text-success")">
+                                        @item.DeadlineDate.Value.ToString("dd.MM.yyyy")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Не указан</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="/Deals/Edit/@item.Id" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/Deals/Delete/@item.Id" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
